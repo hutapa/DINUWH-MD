@@ -6,7 +6,7 @@ const {
     fetchJson
   } = require("../lib/functions");
   cmd({
-    'pattern': "logo",
+    'pattern': "logo2",
     'desc': "Create logos",
     'react': '🎨',
     'category': "other",
