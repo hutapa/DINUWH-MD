@@ -5,45 +5,17 @@ const { ytmp3 } = require("@vreden/youtube_scraper");
 cmd(
   {
     pattern: "song",
-    alias: "ytmp3", // Add a comma here
+    alias: "ytmp3",
     react: "🎵",
     desc: "Download Song",
     category: "download",
     filename: __filename,
   },
-  async (
-    robin,
-    mek,
-    m,
-    {
-      from,
-      quoted,
-      body,
-      isCmd,
-      command,
-      args,
-      q,
-      isGroup,
-      sender,
-      senderNumber,
-      botNumber2,
-      botNumber,
-      pushname,
-      isMe,
-      isOwner,
-      groupMetadata,
-      groupName,
-      participants,
-      groupAdmins,
-      isBotAdmins,
-      isAdmins,
-      reply,
-    }
-  ) => {
+  async (robin, mek, m, { from, quoted, body, q, reply }) => {
     try {
-      if (!q) return reply("*නමක් හරි ලින්ක් එකක් හරි දෙන්න* 🌚❤️");
+      if (!q) return reply("*🎶 Song request format is missing! Please send a link or song name. Example: `.song [Song Name]`*");
 
-      // Search for the video
+      // Search for the song
       const search = await yts(q);
       if (!search.videos.length) return reply("❌ Video not found!");
 
@@ -106,48 +78,67 @@ cmd(
         { quoted: mek }
       );
 
-      // Download the audio using @vreden/youtube_scraper
-      const quality = "128"; // Default quality
-      const songData = await ytmp3(url, quality);
+      // Ask user to choose format: 1 (Voice Message), 2 (Audio), 3 (Document)
+      await robin.sendMessage(from, {
+        text: `
+          *🎶 Song Available! Please choose the format:*
+          1️⃣ *Voice Message*
+          2️⃣ *Audio File*
+          3️⃣ *MP3 Document*
 
-      if (!songData || !songData.download || !songData.download.url) {
-        return reply("❌ Failed to download the song!");
-      }
+          *Example Response:* 1, 2, or 3
+        `,
+      });
 
-      // Validate song duration (limit: 30 minutes)
-      let durationParts = data.timestamp.split(":").map(Number);
-      let totalSeconds =
-        durationParts.length === 3
-          ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
-          : durationParts[0] * 60 + durationParts[1];
+      // Wait for user input (1, 2, or 3)
+      const filter = (m) => m.key.fromMe === false && m.key.remoteJid === from;
+      const userResponse = await robin.waitForMessage(from, filter);
 
-      if (totalSeconds > 1800) {
-        return reply("⏱️ Audio limit is 30 minutes!");
-      }
+      let userChoice = userResponse.text;
 
-      // Send audio file
-      await robin.sendMessage(
-        from,
-        {
+      // Handle the user's choice for download type
+      if (userChoice === "1") {
+        // Send Voice Message (PTT)
+        const songData = await ytmp3(url);
+        if (!songData || !songData.download || !songData.download.url) return reply("❌ Failed to fetch song!");
+
+        await robin.sendMessage(from, {
           audio: { url: songData.download.url },
           mimetype: "audio/mpeg",
-        },
-        { quoted: mek }
-      );
+          ptt: true, // Sends as voice message
+        });
 
-      // Send as a document
-      await robin.sendMessage(
-        from,
-        {
+        return reply("*✅ Voice message sent successfully!*");
+
+      } else if (userChoice === "2") {
+        // Send Audio File
+        const songData = await ytmp3(url);
+        if (!songData || !songData.download || !songData.download.url) return reply("❌ Failed to fetch song!");
+
+        await robin.sendMessage(from, {
+          audio: { url: songData.download.url },
+          mimetype: "audio/mpeg",
+        });
+
+        return reply("*✅ Audio file sent successfully!*");
+
+      } else if (userChoice === "3") {
+        // Send MP3 as Document
+        const songData = await ytmp3(url);
+        if (!songData || !songData.download || !songData.download.url) return reply("❌ Failed to fetch song!");
+
+        await robin.sendMessage(from, {
           document: { url: songData.download.url },
           mimetype: "audio/mpeg",
           fileName: `${data.title}.mp3`,
-          caption: "𝐌𝐚𝐝𝐞 𝐛𝐲 𝐃𝐈𝐍𝐔𝐖𝐇 𝐌𝐃 ❤️",
-        },
-        { quoted: mek }
-      );
+          caption: "🎶 *MP3 File Downloaded by 𝐃𝐈𝐍𝐔𝐖𝐇 𝐌𝐃*",
+        });
 
-      return reply("*✅ Download complete! Enjoy your song!*");
+        return reply("*✅ MP3 document sent successfully!*");
+
+      } else {
+        return reply("❌ Invalid choice! Please choose 1, 2, or 3.");
+      }
     } catch (e) {
       console.error(e);
       reply(`❌ Error: ${e.message}`);
