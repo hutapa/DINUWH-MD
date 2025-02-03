@@ -106,31 +106,34 @@ l(e)
 
 
 cmd({
-pattern: "del",
-react: "❌",
-alias: [","],
-desc: "delete message",
-category: "group",
-use: '.del',
-filename: __filename
+  pattern: "del",
+  react: "❌",
+  alias: [","],
+  desc: "delete message",
+  category: "group",
+  use: '.del',
+  filename: __filename
 },
-async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants,  isItzcp, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-if (!isOwner ||  !isAdmins) return;
-try{
-if (!m.quoted) return reply(mg.notextfordel);
-const key = {
-            remoteJid: m.chat,
-            fromMe: false,
-            id: m.quoted.id,
-            participant: m.quoted.sender
-        }
-        await conn.sendMessage(m.chat, { delete: key })
-} catch(e) {
-console.log(e);
-reply('Error!!')
-} 
-})
+async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, isItzcp, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+  if (!isOwner && !isAdmins) return reply("You don't have permission to delete messages!");
 
+  try {
+    if (!m.quoted) return reply("No quoted message to delete!");
+
+    const key = {
+      remoteJid: m.chat,
+      fromMe: false,
+      id: m.quoted.id,
+      participant: m.quoted.sender
+    };
+
+    await conn.sendMessage(m.chat, { delete: key });
+    reply("Message deleted successfully!");
+  } catch (e) {
+    console.error(e);
+    reply('Error deleting message!');
+  }
+});
 
 cmd({
     pattern: "remove",
