@@ -12,7 +12,7 @@ cmd({
     try {
         // Check if URL is provided
         if (!args[0]) {
-            return await reply("*ලින්ක් එකක් දියම් http🥲✌️.*");
+            return await reply("*📌 මචං, ලින්ක් එකක් දැම්මනම් විතරයි වැඩේ 😑✌️.*");
         }
 
         const tiktokUrl = args[0];
@@ -66,7 +66,7 @@ cmd({
                         messageID;
 
                 if (isReplyToSentMsg) {
-                    // React to the user's reply (the "1", "2", "3", or "4" message)
+                    // React to the user's reply
                     await conn.sendMessage(from, {
                         react: { text: "🌟", key: mek.key },
                     });
@@ -76,7 +76,7 @@ cmd({
                             // Handle option 1 (No Watermark Video)
                             await conn.sendMessage(
                                 from,
-                                { video: { url: data.nowm }, caption: "Here's your TikTok video without watermark.\n> 👾 THENUX  |   AI ジ" },
+                                { video: { url: data.nowm }, caption: "📥 **මෙන්න Watermark නැති Video එක!**\n🔥 *Powered by DINUWH MD*" },
                                 { quoted: mek }
                             );
                             break;
@@ -84,7 +84,7 @@ cmd({
                             // Handle option 2 (Watermark Video)
                             await conn.sendMessage(
                                 from,
-                                { video: { url: data.watermark }, caption: "Here's your TikTok video with watermark.\n> 👾 THENUX  |   AI ジ" },
+                                { video: { url: data.watermark }, caption: "📥 **මෙන්න Watermark Video එක!**\n🔥 *Powered by DINUWH MD*" },
                                 { quoted: mek }
                             );
                             break;
@@ -92,7 +92,7 @@ cmd({
                             // Handle option 3 (Audio)
                             await conn.sendMessage(
                                 from,
-                                { audio: { url: data.audio }, mimetype: 'audio/mp4', caption: "Here's the TikTok audio." },
+                                { audio: { url: data.audio }, mimetype: 'audio/mp4', caption: "🎵 **මෙන්න TikTok Audio එක!**\n🔥 *Powered by DINUWH MD*" },
                                 { quoted: mek }
                             );
                             break;
@@ -100,7 +100,7 @@ cmd({
                             // Handle option 4 (Thumbnail)
                             await conn.sendMessage(
                                 from,
-                                { image: { url: data.thumbnail }, caption: "Here's the TikTok thumbnail.\n> 👾 THENUX  |   AI ジ" },
+                                { image: { url: data.thumbnail }, caption: "📸 **මෙන්න Thumbnail එක!**\n🔥 *Powered by DINUWH MD*" },
                                 { quoted: mek }
                             );
                             break;
@@ -109,13 +109,13 @@ cmd({
                             await conn.sendMessage(from, {
                                 react: { text: "❓", key: mek.key },
                             });
-                            await reply("❌ Invalid option. Please reply with a number between 1 and 4.");
+                            await reply("❌ *මචං, 1 - 4 අතර ඉලක්කම් වලින් රිප්ලයි කරන්න! 😑*");
                             break;
                     }
 
                     // React to the successful completion of the task
                     await conn.sendMessage(from, {
-                        react: { text : "✅", key: mek.key },
+                        react: { text: "✅", key: mek.key },
                     });
 
                     // Clear the stored TikTok data
@@ -123,18 +123,18 @@ cmd({
                 }
             });
         } else {
-            await reply("❌ Unable to fetch TikTok video details. Please check the URL.");
+            await reply("❌ *බං, මේ TikTok ලින්ක් එක වැරදිද මචං? 🤔*");
         }
     } catch (error) {
         console.error("Error fetching TikTok video:", error);
 
-        // Enhanced error handling
+        // Enhanced funny error messages in Sinhala
         if (error.response) {
-            await reply(`❌ Error: ${error.response.data.message || 'Unable to fetch TikTok video.'}`);
+            await reply(`❌ *අයියෝ! TikTok ලින්ක් එකෙන් දෙයක් අරන් නෑ බං 😭*`);
         } else if (error.request) {
-            await reply("❌ Error: No response received from the TikTok API. Please check your internet connection.");
+            await reply("❌ *අපෝ! ඇයි නේට් එක පට්ට වරදියි? 🤦‍♂️*");
         } else {
-            await reply(`❌ Error: ${error.message}`);
+            await reply(`❌ *අනේ මචං, එකක්ම Error එකක් අවා 😑👉 ${error.message}*`);
         }
     }
 });
