@@ -1,25 +1,114 @@
-// group.js - All Group Related Commands
+const config = require('../config')
+const os = require('os')
+const fs = require('fs')
+const { cmd, commands } = require('../command')
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, jsonformat} = require('../lib/functions')
+const { default: makeWASocket, useMultiFileAuthState, WA_DEFAULT_EPHEMERAL, jidNormalizedUser, proto, getDevice, generateWAMessageFromContent, fetchLatestBaileysVersion, makeInMemoryStore, getContentType, generateForwardMessageContent, downloadContentFromMessage, jidDecode } = require('@whiskeysockets/baileys')
 
-const { cmd, commands } = require('../command');
-const config = require('../config');
-const { fetchJson, getBuffer, getGroupAdmins } = require('../lib/functions');
-const fs = require('fs');
+
+cmd({
+    pattern: "mute",
+    react: "�",
+    desc: "close a group",
+    category: "group",
+    use: '.mute',
+    filename: __filename
+},
+async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
+try{                   
+if (!isGroup) return reply(ONLGROUP)
+if (!isBotAdmins) return reply(botAdmin)
+if (!isAdmins) return reply(ADMIN)
+                                  
+        await conn.groupSettingUpdate(mek.chat, 'announcement')
+        const sendmsg = await conn.sendMessage(mek.chat.G_MUTE)
+await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
+} catch (e) {
+reply('🛑 GROUP IS CLOSED MY BOT OWNER')
+l(e)
+}
+})
 
 
+  
+cmd({
+    pattern: "unmute",
+    react: "�",
+    desc: "open a group",
+    category: "group",
+    use: '.unmute',
+    filename: __filename
+},
+async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
+try{                   
+if (!isGroup) return reply(ONLGROUP)
+if (!isBotAdmins) return reply(botAdmin)
+if (!isAdmins) return reply(ADMIN)
+                                  
+        await conn.groupSettingUpdate(mek.chat, 'not_announcement')
+        const sendmsg = await conn.sendMessage(mek.chat.G_UNMUTE)
+await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
+} catch (e) {
+reply('🛑 GROUP IS OPEN MY BOT OWNER')
+l(e)
+}
+})
 
-// Helper function to check permissions
-const checkPermissions = (isGroup, isAdmins, isOwner, isBotAdmins) => {
-    if (!isGroup) return 'This command can only be used in groups.';
-    if (!isAdmins && !isOwner) return 'This command can only be used by group admins.';
-    if (!isBotAdmins) return 'Bot must be admin to use this command.';
-    return null;
-};
+
+cmd({
+    pattern: "promote",
+    react: "📍",
+    desc: "promote admin to a member",
+    category: "group",
+    use: '.promote',
+    filename: __filename
+},
+async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
+try{                   
+if (!isGroup) return reply(ONLGROUP)
+if (!isBotAdmins) return reply(botAdmin)
+if (!isAdmins) return reply(ADMIN)
+                                  
+         let users = mek.mentionedJid ? mek.mentionedJid : mek.quoted ? mek.quoted.sender : q.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
+		await conn.groupParticipantsUpdate(mek.chat, [users], 'promote').then((res) => reply(jsonformat(res))).catch((err) => reply(jsonformat(err)))
+	reply('🛑 GROUP ADMIN PROMOTE BY MY BOT OWNER')
+await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
+} catch (e) {
+reply('*Done ✓✓*')
+l(e)
+}
+}) 
+
+
+cmd({
+    pattern: "demote",
+    react: "📍",
+    desc: "demote admin to a member",
+    category: "group",
+    use: '.demote',
+    filename: __filename
+},
+async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
+try{                   
+if (!isGroup) return reply(ONLGROUP)
+if (!isBotAdmins) return reply(botAdmin)
+if (!isAdmins) return reply(ADMIN)
+                                  
+         	let users = mek.mentionedJid ? mek.mentionedJid : mek.quoted ? mek.quoted.sender : q.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
+		await conn.groupParticipantsUpdate(mek.chat, [users], 'demote').then((res) => reply(jsonformat(res))).catch((err) => reply(jsonformat(err)))
+reply('🛑 GROUP ADMIN DEMOTE BY MY BOT OWNER')
+await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
+} catch (e) {
+reply('*Done ✓✓*')
+l(e)
+}
+})
 
 
 cmd({
 pattern: "del",
 react: "❌",
-alias: ["del"],
+alias: [","],
 desc: "delete message",
 category: "group",
 use: '.del',
@@ -38,203 +127,11 @@ const key = {
         await conn.sendMessage(m.chat, { delete: key })
 } catch(e) {
 console.log(e);
-reply('successful..✅')
+reply('Error!!')
 } 
 })
 
 
-
-
-
-
-cmd({
-    pattern: "join",
-    fromMe: true,  // Only bot owner can use this command
-    desc: "Make the bot join a group using an invite link.",
-    category: "group",
-    react: "🌀",
-    filename: __filename
-}, async (conn, mek, m, { from, quoted, body, args, q, reply }) => {
-    try {
-        // Check if invite link is provided
-        if (!q || !q.includes("chat.whatsapp.com")) {
-            return await reply("*මොකෙන් ජොයින් වෙන්නද😑*.");
-        }
-        // Extract the group code from the invite link
-        const inviteCode = q.split("chat.whatsapp.com/")[1];
-        // Make the bot join the group using the invite code
-        const response = await conn.groupAcceptInvite(inviteCode);
-        // Send confirmation message if successfully joined
-        if (response) {
-            await reply("⛔ Successfully joined the group!⛔");
-        } else {
-            await reply("*❎Failed to join the group. Please check the invite link.*");
-        }
-    } catch (e) {
-        console.error("Error while joining group:", e);
-        await reply("❗ An error occurred while trying to join the group.");
-    }
-});
-//============================================================================================================================
-// Leave Command
-cmd({
-    pattern: "left",
-    fromMe: true,  // Only bot owner can use this command
-    desc: "Make the bot leave the group.",
-    category: "group",
-    react: "👋",
-    filename: __filename
-}, async (conn, mek, m, { from, isGroup, reply }) => {
-    try {
-        // Check if the command is used in a group
-        if (!isGroup) {
-            return await reply("*මේ ගෘප් එකක්ද😑*");
-        }
-        // Make the bot leave the group
-        await conn.groupLeave(from);
-        // Send confirmation message after leaving the group
-        console.log(`Bot left the group: ${from}`);
-    } catch (e) {
-        console.error("Error while leaving group:", e);
-        await reply(" An error occurred while trying to leave the group.❎");
-    }
-});
-//============================================================================================================================
-// Hidetag Command
-cmd({
-    pattern: "hidetag",
-    fromMe: true,  // Only bot owner can use this command
-    desc: "Send a message with hidden tags to all group members.",
-    category: "group",
-    react: "🔍",
-    filename: __filename
-}, async (conn, mek, m, { from, isGroup, args, q, participants, reply }) => {
-    try {
-        // Check if the command is used in a group
-        if (!isGroup) {
-            return await reply("❌ This command can only be used in a group.");
-        }
-        // Check if a message is provided
-        if (!q) {
-            return await reply("❗ Please provide a message to send.");
-        }
-        // Extract group participants' contact IDs
-        const participantIds = participants.map((participant) => participant.id);
-        // Send the message with hidden tags
-        await conn.sendMessage(from, { 
-            text: q, 
-            mentions: participantIds 
-        });
-        console.log("Hidetag message sent to all group members.");
-    } catch (e) {
-        console.error("Error while sending hidetag message:", e);
-        await reply("❗ An error occurred while trying to send the hidetag message.");
-    }
-});
-
-
-
-
-
-// Mute Group Command
-cmd({
-    pattern: "mute",
-    react: "🔇",
-    desc: "close a group",
-    category: "group",
-    use: '.mute',
-    filename: __filename
-},
-async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{                   
-if (!isGroup) return reply(ONLGROUP)
-if (!isBotAdmins) return reply(botAdmin)
-if (!isAdmins) return reply(ADMIN)
-
-        await conn.groupSettingUpdate(mek.chat, 'announcement')
-        const sendmsg = await conn.sendMessage(mek.chat.G_MUTE)
-await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
-} catch (e) {
-reply('⛔𝙶𝚁𝙾𝚄𝙿 𝙲𝙻𝙾𝚂𝙴𝙳 𝙱𝚈 𝙳𝙸𝙽𝚄𝚆𝙷 𝙼𝙳⛔')
-(e)
-}
-})
-
-// Unmute Group Command
-cmd({
-    pattern: "unmute",
-    react: "🔊",
-    desc: "open a group",
-    category: "group",
-    use: '.unmute',
-    filename: __filename
-},
-async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{                   
-if (!isGroup) return reply(ONLGROUP)
-if (!isBotAdmins) return reply(botAdmin)
-if (!isAdmins) return reply(ADMIN)
-
-        await conn.groupSettingUpdate(mek.chat, 'not_announcement')
-        const sendmsg = await conn.sendMessage(mek.chat.G_UNMUTE)
-await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
-} catch (e) {
-reply('⛔𝙶𝚁𝙾𝚄𝙿 𝙾𝙿𝙴𝙽 𝙱𝚈 𝙳𝙸𝙽𝚄𝚆𝙷 𝙼𝙳⛔')
-l(e)
-}
-})
-
-// Promote Command
-cmd({
-    pattern: "promote",
-    react: "📍",
-    desc: "promote admin to a member",
-    category: "group",
-    use: '.promote',
-    filename: __filename
-},
-async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{                   
-if (!isGroup) return reply(ONLGROUP)
-if (!isBotAdmins) return reply(botAdmin)
-if (!isAdmins) return reply(ADMIN)
-
-         let users = mek.mentionedJid ? mek.mentionedJid : mek.quoted ? mek.quoted.sender : q.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
-                await conn.groupParticipantsUpdate(mek.chat, [users], 'promote').then((res) => reply(jsonformat(res))).catch((err) => reply(jsonformat(err)))
-        reply('🛑 GROUP ADMIN PROMOTE BY MY BOT OWNER')
-await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
-} catch (e) {
-reply('*Done ✓✓*')
-l(e)
-}
-})
-
-// Demote Command
-cmd({
-    pattern: "demote",
-    react: "📍",
-    desc: "demote admin to a member",
-    category: "group",
-    use: '.demote',
-    filename: __filename
-},
-async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{                   
-if (!isGroup) return reply(ONLGROUP)
-if (!isBotAdmins) return reply(botAdmin)
-if (!isAdmins) return reply(ADMIN)
-
-                 let users = mek.mentionedJid ? mek.mentionedJid : mek.quoted ? mek.quoted.sender : q.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
-                await conn.groupParticipantsUpdate(mek.chat, [users], 'demote').then((res) => reply(jsonformat(res))).catch((err) => reply(jsonformat(err)))
-reply('🛑 GROUP ADMIN DEMOTE BY MY BOT OWNER')
-await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
-} catch (e) {
-reply('*Done ✓✓*')
-l(e)
-}
-})
-
-// Remove Member Command
 cmd({
     pattern: "remove",
     desc: "Remove a member from the group.",
@@ -259,7 +156,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
     }
 })
 
-// Add Member Command
+
 cmd({
     pattern: "add",
     desc: "Add a member to the group.",
@@ -269,12 +166,12 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        if (!isGroup) return reply('*ගෘප් එකක ගහපන් බම්*.')
-        if (!isBotAdmins) return reply('*ඇඩ්මින් දීලා ගහමු නේද ඕක🥲👌*.')
-        if (!isAdmins) return reply('*උබ ඇඩ්මින් වෙලා ගහන්න🤫✌️*.')
+        if (!isGroup) return reply('This command can only be used in a group.')
+        if (!isBotAdmins) return reply('Bot must be an admin to use this command.')
+        if (!isAdmins) return reply('You must be an admin to use this command.')
 
         const user = q.split(' ')[0]
-        if (!user) return reply('*ෆෝන් නම්බර් එක ගහන්නෙ මමද😑*.')
+        if (!user) return reply('Please provide a phone number to add.')
 
         await conn.groupParticipantsUpdate(from, [`${user}@s.whatsapp.net`], 'add')
         await reply(`@${user} has been added to the group.`, { mentions: [`${user}@s.whatsapp.net`] })
@@ -284,113 +181,99 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
     }
 })
 
-// Group Info Command
-
-
-
-// Tag Admins Command
 
 cmd({
-    pattern: "tagadmin",
-    alias: "admin",
-    alais:["tagadmins"],
-    react: "🙀",
-    desc: "Tags all the admins in the group.",
+    pattern: "setgoodbye",
+    desc: "Set the goodbye message for the group.",
     category: "group",
-    filename: __filename,
-},           
-async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{
-        if (!isGroup) return reply(`This command is only for groups.`);
-        if (!isAdmins) return reply(`This command is only for group admin.`);
+    react: "👋",
+    filename: __filename
+},
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply('This command can only be used in a group.')
+        if (!isBotAdmins) return reply('Bot must be an admin to use this command.')
+        if (!isAdmins) return reply('You must be an admin to use this command.')
 
-        const admins = groupAdmins;
-        if (admins.length === 0) {
-            return reply('There are no admins in this group.');
-        }
-        let adminTagMessage = '*𝙰𝙳𝙼𝙸𝙽 𝚃𝙰𝙶 𝙰𝙻𝙻:*\n\n';
-        for (let admin of admins) {
-            adminTagMessage += `@${admin.split('@')[0]}\n`;
-        }
-        await conn.sendMessage(from, { text: adminTagMessage, mentions: admins }, { quoted: mek });
+        const goodbye = q
+        if (!goodbye) return reply('Please provide a goodbye message.')
+
+        await conn.sendMessage(from, { image: { url: config.ALIVE_IMG }, caption: goodbye })
+        await reply('Goodbye message has been set.')
     } catch (e) {
-        console.error('Error tagging admins:', e);
-        reply('you are not an admin.');
+        console.log(e)
+        reply(`${e}`)
     }
 })
 
-//open Time Command
+
 cmd({
-    pattern: "opentime",
-    react: "🔖",
-    desc: "To open group to a time",
+    pattern: "setwelcome",
+    desc: "Set the welcome message for the group.",
     category: "group",
-    use: '.opentime',
+    react: "👋",
     filename: __filename
 },
-async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{   
-if (!isGroup) return reply(ONLGROUP)
-if (!isAdmins) return reply(ADMIN)        
-  if (args[1] == 'second') {
-                    var timer = args[0] * `1000`
-                } else if (args[1] == 'minute') {
-                    var timer = args[0] * `60000`
-                } else if (args[1] == 'hour') {
-                    var timer = args[0] * `3600000`
-                } else if (args[1] == 'day') {
-                    var timer = args[0] * `86400000`
-                } else {
-                    return reply('*select:*\nsecond\nminute\nhour\n\n*example*\n10 second')
-                }
-                reply(`Open time ${q} starting from now`)
-                setTimeout(() => {
-                    var nomor = mek.participant
-                    const open = `*OPEN TIME* THE GROUP WAS OPENED BY AWAIS MD TO APPROVED ADMIN\n NOW MEMBERS CAN SEND MESSAGES 🔓`
-                    conn.groupSettingUpdate(from, 'not_announcement')
-                    reply(open)
-                }, timer)
-await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply('This command can only be used in a group.')
+        if (!isBotAdmins) return reply('Bot must be an admin to use this command.')
+        if (!isAdmins) return reply('You must be an admin to use this command.')
+
+        const welcome = q
+        if (!welcome) return reply('Please provide a welcome message.')
+
+        await conn.sendMessage(from, { image: { url: config.ALIVE_IMG }, caption: welcome })
+        await reply('Welcome message has been set.')
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
+})
+
+
+cmd({
+    pattern: "kick",
+    react: "🚫",
+    alias: [".."],
+    desc: "Kicks replied/quoted user from group.",
+    category: "group",
+    filename: __filename,
+    use: '<quote|reply|number>',
+},           
+async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants,  isItzcp, groupAdmins, isBotAdmins, isAdmins, reply}) => {
+if(!isOwner ||  !isAdmins)return;
+try {
+    if (!m.isGroup) return reply(mg.onlygroup);
+    if (!isBotAdmins) return reply(mg.needbotadmins);
+
+
+const user = m.quoted.sender;
+if (!user) return reply(mg.nouserforkick);
+await conn.groupParticipantsUpdate(m.chat, [user], "remove");
+reply(mg.userremoved);
 } catch (e) {
-reply('*Error !!*')
+reply('*shadow md kick successful_✓✓*')
 l(e)
 }
 })
 
-// Close Time Command
+
 cmd({
-    pattern: "closetime",
-    react: "🔖",
-    desc: "To close group to a time",
+    pattern: "getpic",
+    desc: "Get the group profile picture.",
     category: "group",
-    use: '.closstime',
+    react: "🖼️",
     filename: __filename
 },
-async(conn, mek, m,{from, prefix, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{   
-if (!isGroup) return reply(ONLGROUP)
-if (!isAdmins) return reply(ADMIN)        
-                if (args[1] == 'second') {
-                    var timer = args[0] * `1000`
-                } else if (args[1] == 'minute') {
-                    var timer = args[0] * `60000`
-                } else if (args[1] == 'hour') {
-                    var timer = args[0] * `3600000`
-                } else if (args[1] == 'day') {
-                    var timer = args[0] * `86400000`
-                } else {
-                    return reply('*select:*\nsecond\nminute\nhour\n\n*Example*\n10 second')
-                }
-                reply(`Close time ${q} starting from now`)
-                setTimeout(() => {
-                    var nomor = m.participant
-                    const close = `*CLOSE TIME* GROUP CLOSED BY AWAIS MD AT APPROVED ADMIN\nNOW ONLY ADMIN CAN SEND MESSAGES 🔐`
-                    conn.groupSettingUpdate(from, 'announcement')
-                    reply(close)
-                }, timer)
-await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
-} catch (e) {
-reply('*Error !!*')
-l(e)
-}
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply('This command can only be used in a group.')
+
+        const groupPic = await conn.getProfilePicture(from)
+        await conn.sendMessage(from, { image: { url: groupPic }, caption: 'Group Profile Picture' })
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
 })
