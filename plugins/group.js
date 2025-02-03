@@ -106,9 +106,10 @@ l(e)
 
 
 cmd({
+cmd({
   pattern: "del",
   react: "❌",
-  alias: [","],
+  alias: ["dmsg"],
   desc: "delete message",
   category: "group",
   use: '.del',
@@ -128,13 +129,19 @@ async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, 
     };
 
     await conn.sendMessage(m.chat, { delete: key });
-    reply("Message deleted successfully!");
+
+    // Delayed message after deletion
+    setTimeout(() => {
+      reply("Message deleted successfully!");
+    }, 2000);  // Adjust the time (in milliseconds) to control the delay
+
   } catch (e) {
     console.error(e);
     reply('Error deleting message!');
   }
-});
-
+}):
+	/
+	
 cmd({
     pattern: "remove",
     desc: "Remove a member from the group.",
@@ -208,8 +215,10 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         reply(`${e}`)
     }
 })
+	/
 
 
+	
 cmd({
     pattern: "setwelcome",
     desc: "Set the welcome message for the group.",
