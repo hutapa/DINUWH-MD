@@ -156,7 +156,7 @@ if (!isAdmins) return reply(ADMIN)
 await conn.sendMessage(from, { react: { text: `✅`, key: mek.key }}) 
 } catch (e) {
 reply('⛔𝙶𝚁𝙾𝚄𝙿 𝙲𝙻𝙾𝚂𝙴𝙳 𝙱𝚈 𝙳𝙸𝙽𝚄𝚆𝙷 𝙼𝙳⛔')
-l(e)
+(e)
 }
 })
 
