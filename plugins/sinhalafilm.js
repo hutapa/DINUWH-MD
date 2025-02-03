@@ -1,7 +1,4 @@
-//Share කරනවනම් Credit ඕනි එච්චරයි. 🌝
-/*
-> Created by_* 👨🏼‍💻 :- *_Sl Nethu Max Yt_*
-*/
+// Code to share in the channel with the image
 
 const { fetchJson } = require('../lib/functions');
 const config = require('../config');
@@ -14,7 +11,6 @@ const fs = require('fs');
 const path = require('path');
 
 //--------------------------- Sinhalasub ------------------------------//
-
 
 cmd({
     pattern: "sinhalasub",
@@ -58,7 +54,6 @@ cmd({
             }
         }, { quoted: mek });
 
-       
         const messageListener = async (update) => {
             const message = update.messages[0];
             if (!message.message || !message.message.extendedTextMessage) return;
@@ -76,7 +71,6 @@ cmd({
             const selectedMovie = result.results[selectedMovieIndex];
             const link = selectedMovie.link;
 
-            
             const movieDetails = await SinhalaSub.movie(link);
             if (!movieDetails || !movieDetails.status || !movieDetails.result) {
                 return reply("Movie details not found or invalid link provided.");
@@ -98,16 +92,13 @@ cmd({
 
             const imageUrl = movie.images && movie.images.length > 0 ? movie.images[0] : '';
 
-           
             const movieDetailsMessage = await conn.sendMessage(from, {
                 image: { url: imageUrl },
                 caption: movieMessage
             });
 
-            
             conn.ev.off("messages.upsert", messageListener);
 
-           
             const qualityListener = async (update) => {
                 const message = update.messages[0];
                 if (!message.message || !message.message.extendedTextMessage) return;
@@ -130,29 +121,29 @@ cmd({
                      
                         const directLink = await PixaldrainDL(link, quality, "direct");
                         if (directLink) {
-                const sentMsg = await conn.sendMessage(from, {
+                            const sentMsg = await conn.sendMessage(from, {
                                 document: { url: directLink },
                                 mimetype: 'video/mp4',
                                 fileName: `🍿Qᴜᴇᴇɴ ɴᴇᴛʜᴜ ᴍᴏᴠɪᴇ ᴜᴘʟᴏᴅᴇʀ.mp4`,
                                 caption: `${movie.title}\n\n*©Qᴜᴇᴇɴ ɴᴇᴛʜᴜ 〽️Ｄ ʙʏ ɴᴇᴛʜᴜ 〽️Ax ʏᴛ*`,
-                 contextInfo: {
-                forwardingScore: 999,
-                isForwarded: false,
-                forwardedNewsletterMessageInfo: {
-                    newsletterName: '𝗡𝗘𝗧𝗛𝗨 〽️𝗔𝗫 𝗬𝗧',
-                    newsletterJid: "120363322195409882@newsletter",
-                },
-                externalAdReply: {
-                    title: '𝐐𝐔𝐄𝐄𝐍 𝐍𝐄𝐓𝐇𝐔 𝐌𝐃 𝐖𝐀 𝐁𝐎𝐓💛',
-                    body: 'ᴀ Qᴜᴇᴇɴ ɴᴇᴛʜᴜ ᴍᴅ ᴡᴀ ʙᴏᴛ ʙᴇꜱᴇᴅ ᴏɴ ʙᴀɪʏʟᴇꜱ',
-                    mediaType: 1,
-                    sourceUrl: "https://www.youtube.com/@SlNethuMax",
-                    thumbnailUrl: 'https://i.ibb.co/wsRfxsf/IMG-20241220-WA0008.jpg',
-                    renderLargerThumbnail: false,
-                    showAdAttribution: true
-                }
-            }
-       });
+                                contextInfo: {
+                                    forwardingScore: 999,
+                                    isForwarded: false,
+                                    forwardedNewsletterMessageInfo: {
+                                        newsletterName: '𝗡𝗘𝗧𝗛𝗨 〽️𝗔𝗫 𝗬𝗧',
+                                        newsletterJid: "120363322195409882@newsletter",
+                                    },
+                                    externalAdReply: {
+                                        title: '𝐐𝐔𝐄𝐄𝐍 𝐍𝐄𝐓𝐇𝐔 𝐌𝐃 𝐖𝐀 𝐁𝐎𝐓💛',
+                                        body: 'ᴀ Qᴜᴇᴇɴ ɴᴇᴛʜᴜ ᴍᴅ ᴡᴀ ʙᴏᴛ ʙᴇꜱᴇᴅ ᴏɴ ʙᴀɪʏʟᴇꜱ',
+                                        mediaType: 1,
+                                        sourceUrl: "https://www.youtube.com/@SlNethuMax",
+                                        thumbnailUrl: 'https://i.ibb.co/wsRfxsf/IMG-20241220-WA0008.jpg',
+                                        renderLargerThumbnail: false,
+                                        showAdAttribution: true
+                                    }
+                                }
+                            });
                            
                             await conn.sendMessage(from, {
                                 react: { text: '✅', key: mek.key }
@@ -173,19 +164,15 @@ cmd({
                 }
             };
 
-           
             conn.ev.on("messages.upsert", qualityListener);
 
-            
             setTimeout(() => {
                 conn.ev.off("messages.upsert", qualityListener);
             }, 200000);
         };
 
-        
         conn.ev.on("messages.upsert", messageListener);
 
-        
         setTimeout(() => {
             conn.ev.off("messages.upsert", messageListener);
         }, 200000);
