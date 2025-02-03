@@ -285,35 +285,11 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 })
 
 // Group Info Command
-cmd({
-    pattern: "groupinfo",
-    desc: "Get information about the group.",
-    category: "group",
-    filename: __filename,
-    react: "ℹ️"
-},
-async(conn, mek, m, { from, isGroup, groupMetadata, groupName, participants, groupAdmins, reply }) => {
-    try {
-        if (!isGroup) return reply('*කමාන්ඩ් එක ගෘප් එකක ගහපම්කෝ🥲*');
 
-        const groupInfo = 
-📋 *Group Information*
-👥 *Name:* ${groupName}
-📝 *Description:* ${groupMetadata.desc || 'No description'}
-🆔 *ID:* ${from}
-👑 *Owner:* ${groupMetadata.owner || 'Not available'}
-👤 *Members:* ${participants.length}
-👮 *Admins:* ${groupAdmins.length}
-📅 *Created:* ${new Date(groupMetadata.creation * 1000).toLocaleString()}\n\n𝚙𝚘𝚠𝚎𝚛𝚍 𝚋𝚢 𝙳𝙸𝙽𝚄𝚆𝙷 𝚖𝚍 💀✌️\n\n⚋⛚𝙼𝙰𝙺𝙴 𝙱𝚈 𝙳𝙸𝙽𝚄𝙴𝙷 𝙼𝙳⛚⚋
-        `;
-        reply(groupInfo);
-    } catch(e) {
-        console.error(e);
-        reply(`❌ Error: ${e}`);
-    }
-})
+
 
 // Tag Admins Command
+
 cmd({
     pattern: "tagadmin",
     alias: "admin",
@@ -343,7 +319,7 @@ try{
     }
 })
 
-// Open Time Command
+//open Time Command
 cmd({
     pattern: "opentime",
     react: "🔖",
