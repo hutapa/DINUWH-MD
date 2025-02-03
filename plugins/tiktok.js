@@ -1,15 +1,9 @@
-/* 
-Thenux-AI 
-   Give credit.*/
-
-
-
 const { cmd } = require('../command');
 const axios = require('axios');
 
 cmd({
-    pattern: "tt2",
-    alias: ["tiktokdl"],
+    pattern: "tt",
+    alias: ["tiktok"],
     react: "🎬",
     desc: "Download TikTok video using the provided URL",
     category: "download",
@@ -18,7 +12,7 @@ cmd({
     try {
         // Check if URL is provided
         if (!args[0]) {
-            return await reply("📥 Please provide a TikTok video URL.");
+            return await reply("*ලින්ක් එකක් දියම් http🥲✌️.*");
         }
 
         const tiktokUrl = args[0];
@@ -32,34 +26,25 @@ cmd({
             const data = response.data.data.data;
 
             // Prepare the message with video details and options
-            const message = `
-🎬 *乂 THENU-MD TIKTOK DOWNLOADER ◉◉►*
+            const message = `🎬 ⇼⛚ 𝙳𝙸𝙽𝚄𝚆𝙷 ⚋ 𝙼𝙳 ⚋ 𝚃𝙸𝙺𝚃𝙾𝙺 ⚋ 𝙳𝙾𝚆𝙽𝙻𝙾𝙰𝙳𝙴𝚁 ⛚⇼  
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-1. *Title:* ${data.title}\n
-2. *Author:* ${data.author}
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━ ℹ️ 𝙳𝙴𝚃𝙰𝙸𝙻𝚂 ━━━━━━━━━━━┓  
+📌 *Title:* ${data.title}  
+👤 *Author:* ${data.author}  
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  
 
-*乂◉◉► REPLY THE DOWNLOAD OPTION* 
+💠 *ඔනි ටයිප් එකේ අංකයට රිප්ලයි කරාපිය!*  
 
-┌───────────────────────────────────
+┌──────────────────────────────┐  
+   📥 *Download Options:*  
+   1️⃣ *No Watermark Video*  
+   2️⃣ *Watermark Video*  
+   3️⃣ *MP3 (Audio)*  
+   4️⃣ *Thumbnail*  
+└──────────────────────────────┘  
 
-📥 *Download Options:*
-
-1. *No Watermark Video*
-
-2. *Watermark Video*
-
-3. *Audio*
-
-4. *Thumbnail*
-
-└───────────────────────────────────
-
-Reply with the number of the option you want to download.
-
-> ©ᴡʜᴀᴛꜱᴀᴘᴘ ʙᴏᴛ ʙʏ Thenu-MD (WOLF-MD)
-> *©ᴘᴏᴡᴇʀᴇᴅ ʙʏ Thenux AI*`;
+⚡ *Powered by DINUWH MD WhatsApp Bot*  
+🔥 *Made by DINUWH Boy ✌️*`;
 
             // Send the message and save the message ID
             const sentMsg = await conn.sendMessage(from, { image: { url: data.thumbnail }, caption: message }, { quoted: mek });
