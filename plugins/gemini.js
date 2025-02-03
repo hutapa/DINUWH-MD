@@ -1,9 +1,6 @@
-//---- *REPLACE WITH YOUR API KEY* 🤌
-
-
 const axios = require("axios")
 
-const GEMINI_API_KEY = "";  //REPLACE WITH YOUR API KEY OF GEMINI
+const GEMINI_API_KEY = "AIzaSyAVIAr0vexThQOSX9TDinXciV2z5uzCa-8";  //REPLACE WITH YOUR API KEY OF GEMINI
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 cmd({
