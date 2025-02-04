@@ -116,19 +116,6 @@ robin.ev.on("messages.upsert", async (mek) => {
       ? mek.message.ephemeralMessage.message
       : mek.message;
 
-  // ----- *STATUS AUTO REACT* -----
-  if (mek.key && mek.key.remoteJid === "status@broadcast" && config.AUTO_READ_STATUS === "true") {
-    await robin.readMessages([mek.key]);
-
-    
-    // Send reaction (emoji) to status update
-    await robin.sendMessage(mek.key.remoteJid, {
-      react: {
-        text: randomEmoji,
-        key: mek.key,
-      },
-    });
-  }
 
   const m = sms(robin, mek);
 });
