@@ -1,42 +1,19 @@
-const {readEnv} = require('../lib/database')
-const {cmd, commands} = require('../command')
+const { cmd } = require('../command'); // Ensure the path is correct
 
 cmd({
-    pattern: "alive",
-    desc: "Check bot online or no.",
-    category: "main",
+    pattern: "ping",
+    alias: ["pong"],
+    react: "🏓",
+    desc: "Check the bot's responsiveness",
+    category: "utility",
+    use: '.ping',
     filename: __filename
 },
-async(robin, mek, m, {from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-    try {
-        const config = await readEnv();
-        // Sending alive message with image
-        await robin.sendMessage(from, { 
-            image: { url: config.ALIVE_IMG },
-            caption: config.ALIVE_MSG 
-        }, { quoted: mek });
-        
-        // Sending channel info
-        const menuText = "Check out our channel for more updates!";
-        await robin.sendMessage(
-            from,
-            {
-                text: menuText,
-                contextInfo: {
-                    externalAdReply: {
-                        title: "𝙳𝙸𝙽𝚄𝚆𝙷 𝙼𝙳 𝚃𝙴𝙲𝙷 𝙲𝙷𝙽𝙽𝙻",
-                        body: "© 𝙼𝙰𝙳𝙴 𝙱𝚈 𝙳𝙸𝙽𝚄𝚆𝙷 𝙱𝙾𝚈🫣",
-                        thumbnail: { url: "https://i.ibb.co/h1cJpJv4/256ebbe3dd561868.jpg" },
-                        sourceUrl: "https://whatsapp.com/channel/0029Vat7xHl7NoZsrUVjN844",
-                        mediaType: 1,
-                        renderLargerThumbnail: true
-                    }
-                }
-            },
-            { quoted: mek }
-        );
-    } catch (e) {
-        console.log(e);
-        reply(`${e}`);
-    }
+async(conn, mek, m, { from, reply }) => {
+    const start = Date.now();
+    await reply("𝐂𝐡𝐞𝐜𝐤𝐢𝐧𝐠 𝐃𝐢𝐝𝐮𝐥𝐚 𝐌𝐃 𝐒𝐩𝐞𝐞𝐝💚"); // Inform the user that the ping is in progress
+    const end = Date.now();
+    
+    const latency = end - start; // Calculate the latency
+    await reply(`𝐃𝐢𝐝𝐮𝐥𝐚 𝐌𝐃 𝐒𝐩𝐞𝐞𝐝 💚: ${latency}𝐦𝐬`);
 });
