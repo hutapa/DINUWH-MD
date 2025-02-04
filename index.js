@@ -22,7 +22,7 @@ const {
 } = require("./lib/functions");
 const fs = require("fs");
 const P = require("pino");
-const config = require("./config");
+const config = require("../lib/mongodbenv");
 const qrcode = require("qrcode-terminal");
 const util = require("util");
 const { sms, downloadMediaMessage } = require("./lib/msg");
