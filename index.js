@@ -116,7 +116,7 @@ async function connectToWA() {
         : mek.message;
     if (
       mek.key &&
-      mek.key.remoteJid === "status@broadcast") &&
+      mek.key.remoteJid === "status@broadcast" &&
       config.AUTO_READ_STATUS === "true"
       ) {
     await.robin([mek.key]);
