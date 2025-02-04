@@ -401,14 +401,22 @@ robin.ev.on("messages.upsert", async (mek) => {
       }
     });
     //============================================================================
-  });
-}
 app.get("/", (req, res) => {
   res.send("hey, ❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ started✅");
 });
-app.listen(port, () =>
-  console.log(`Server listening on port http://localhost:${port}`)
-);
+
+// ✅ Ensure `port` is defined
+const port = process.env.PORT || 8000;
+
+app.listen(port, () => {
+  console.log(`Server listening on port http://localhost:${port}`);
+});
+
+// ✅ Ensure `connectToWA` is defined before calling it
 setTimeout(() => {
-  connectToWA();
+  if (typeof connectToWA === "function") {
+    connectToWA();
+  } else {
+    console.error("⚠️ connectToWA function is not defined!");
+  }
 }, 4000);
