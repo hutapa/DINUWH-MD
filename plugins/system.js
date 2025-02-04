@@ -1,4 +1,4 @@
-const { readEnv } = require('../lib/database');
+
 const { cmd } = require('../command');
 const si = require('systeminformation'); // Import system information
 
