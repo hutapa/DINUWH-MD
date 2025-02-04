@@ -419,4 +419,5 @@ setTimeout(() => {
   } else {
     console.error("⚠️ connectToWA function is not defined!");
   }
-}, 4000);
+},
+4000);
