@@ -243,6 +243,7 @@ robin.ev.on("messages.upsert", async (mek) => {
       }
     };
 
+    
     //work type
     if (!isOwner && config.MODE === "private") return;
     if (!isOwner && isGroup && config.MODE === "inbox") return;
@@ -401,35 +402,14 @@ robin.ev.on("messages.upsert", async (mek) => {
       }
     });
     //============================================================================
-// 🛠️ Define `connectToWA()` function before calling it!
-async function connectToWA() {
-  console.log("Connecting to WhatsApp...");
-  // Your WhatsApp connection logic here
+  });
 }
-
-const express = require("express");
-const app = express();
-const port = process.env.PORT || 8000;
-
-// Root Route
 app.get("/", (req, res) => {
   res.send("hey, ❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ started✅");
 });
-
-// Start Server
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
-
-// Define connectToWA function
-async function connectToWA() {
-  try {
-    console.log("Connecting to WhatsApp...");
-    // Add WhatsApp connection logic here
-  } catch (error) {
-    console.error("WhatsApp connection error:", error);
-  }
-}
-
-// Call `connectToWA`
-setTimeout(connectToWA, 4000);
+app.listen(port, () =>
+  console.log(`Server listening on port http://localhost:${port}`)
+);
+setTimeout(() => {
+  connectToWA();
+}, 4000);
