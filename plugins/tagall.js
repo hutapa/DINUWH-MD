@@ -1,56 +1,16 @@
-const { cmd, commands } = require('../command');
+const handler = async (m, { conn, text, participants }) => {
+    let message = text ? text : "📢 *Mentioning All Members*";
+    let users = participants.map(u => u.id);
+    
+    await conn.sendMessage(
+        m.chat,
+        { text: message, mentions: users },
+        { quoted: m }
+    );
+};
 
-cmd(
-  {
-    pattern: "tagall",
-    alias: ["mentionall", "pingall"],
-    desc: "Mention all members in the group",
-    category: "main",
-    filename: __filename,
-  },
-  async (
-    robin,
-    mek,
-    m,
-    {
-      from,
-      isGroup,
-      isAdmins,
-      isOwner,
-      isBotAdmins,
-      participants,
-      botNumber,
-      reply,
-    }
-  ) => {
-    try {
-      if (!isGroup) {
-        return reply("This command can only be used in a group!");
-      }
+handler.command = ['tagall'];
+handler.group = true;
+handler.admin = true; // Only Admins Can Use
 
-      // Check if the sender is an admin
-      if (!isAdmins && !isOwner && !isBotAdmins) {
-        return reply("You need to be an admin to use this command.");
-      }
-
-      // Remove bot from the mention list
-      const filteredParticipants = participants.filter((p) => p.id !== botNumber);
-
-      // Create mention text
-      const mentions = filteredParticipants.map((p) => `@${p.id.split('@')[0]}`).join(' ');
-
-      // Send the message
-      return await robin.sendMessage(
-        from,
-        {
-          text: mentions,
-          mentions: filteredParticipants.map((p) => p.id),
-        },
-        { quoted: mek }
-      );
-    } catch (e) {
-      console.log(e);
-      reply(`❌ Error: ${e.message || "An unknown error occurred!"}`);
-    }
-  }
-);
+export default handler;
