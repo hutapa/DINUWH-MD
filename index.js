@@ -104,7 +104,7 @@ async function connectToWA() {
         },
         caption: up,
       });
-      robin.sendMessage("94705900209@s.whatsapp.net", {
+      robin.sendMessage("94728899640@s.whatsapp.net", {
         image: {
           url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg`,
         },
@@ -117,7 +117,7 @@ async function connectToWA() {
 
   robin.ev.on('messages.upsert', async(mek) => {
 mek = mek.messages[0]
-if (mek.key && mek.key.remoteJid === 'status@broadcast' && easy.AUTO_READ_STATUS === "true"){
+if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_READ_STATUS === "true"){
       await robin.readMessages([mek.key])
 }
 
