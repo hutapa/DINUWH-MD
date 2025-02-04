@@ -22,14 +22,15 @@ const {
 } = require("./lib/functions");
 const fs = require("fs");
 const P = require("pino");
-const config = require("./lib/mongodb");
+const config = require(".config");
 const qrcode = require("qrcode-terminal");
 const util = require("util");
+const easy = require("./lib/mongodb");
 const { sms, downloadMediaMessage } = require("./lib/msg");
 const axios = require("axios");
 const { File } = require("megajs");
 
-const ownerNumber = config.OWNER_NUM;
+const ownerNumber = config.OWNER_NUMBER;
 
 //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + "/auth_info_baileys/creds.json")) {
@@ -117,7 +118,7 @@ async function connectToWA() {
 
   robin.ev.on('messages.upsert', async(mek) => {
 mek = mek.messages[0]
-if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_READ_STATUS === "true"){
+if (mek.key && mek.key.remoteJid === 'status@broadcast' && easy.AUTO_READ_STATUS === "true"){
       await robin.readMessages([mek.key])
 }
 
@@ -125,7 +126,7 @@ if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_READ_STAT
   //------- *STATUS AUTO REACT* ----------
 
     
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_REACT_STATUS === "false"){
+  if (mek.key && mek.key.remoteJid === 'status@broadcast' && easy.AUTO_REACT_STATUS === "false"){
     const emojis = ['🧩', '🍉', '💜', '🌸', '🪴', '💊', '💫', '🍂', '🌟', '🎋', '😶‍🌫️', '🫀', '🧿', '👀', '🤖', '🚩', '🥰', '🗿', '💜', '💙', '🌝', '🖤', '💚'];
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
     await robin.sendMessage(mek.key.remoteJid, {
