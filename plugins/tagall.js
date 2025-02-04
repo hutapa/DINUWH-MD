@@ -1,4 +1,3 @@
-
 const { cmd, commands } = require('../command');
 
 cmd(
@@ -16,23 +15,11 @@ cmd(
     {
       from,
       quoted,
-      body,
-      isCmd,
-      command,
-      args,
-      q,
       isGroup,
       sender,
-      senderNumber,
-      botNumber2,
-      botNumber,
-      pushname,
-      isMe,
       isOwner,
       groupMetadata,
-      groupName,
       participants,
-      groupAdmins,
       isBotAdmins,
       isAdmins,
       reply,
@@ -49,20 +36,19 @@ cmd(
       }
 
       // Create the mention text for all group members
-      const mentions = participants.map((participant) => `@${participant.id.split('@')[0]}`).join(' ');
+      const mentions = participants.map((p) => `@${p.id.split('@')[0]}`).join(' ');
 
-      const config = await readEnv();
-      
-      // Prepare the message
-      const message = `${mentions}\n\n${config.ALIVE_MSG || 'The bot is alive and running!'}`;
+      // Default values for message and image (without database)
+      const ALIVE_MSG = "The bot is alive and running!";
+      const ALIVE_IMG = "https://via.placeholder.com/300"; // Default image
 
-      // Send the message with a custom image and caption
+      // Send the message
       return await robin.sendMessage(
         from,
         {
-          image: { url: config.ALIVE_IMG || "https://via.placeholder.com/300" },  // Default image if ALIVE_IMG not set
-          caption: message,
-          mentions: participants.map((participant) => participant.id),  // This will mention all participants
+          image: { url: ALIVE_IMG },
+          caption: `${mentions}\n\n${ALIVE_MSG}`,
+          mentions: participants.map((p) => p.id),
         },
         { quoted: mek }
       );
