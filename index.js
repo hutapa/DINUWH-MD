@@ -96,29 +96,46 @@ async function connectToWA() {
       console.log("❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ connected to whatsapp ✅");
 
       let up = `❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ connected successful ✅`;
-let up1 = `Hello Robin, I made bot successful`;
+      let up1 = `Hello Robin, I made bot successful`;
 
-robin.sendMessage(ownerNumber + "@s.whatsapp.net", {
-  image: { 
-    url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg` 
-  },
-  caption: up
-});
+      robin.sendMessage(ownerNumber + "@s.whatsapp.net", {
+        image: {
+          url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg`,
+        },
+        caption: up,
+      });
+      robin.sendMessage("94705900209@s.whatsapp.net", {
+        image: {
+          url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg`,
+        },
+        caption: up1,
+      });
     }
   });
   robin.ev.on("creds.update", saveCreds);
 
-robin.ev.on("messages.upsert", async (mek) => {
-  mek = mek.messages[0];
-  if (!mek.message) return;
-  mek.message =
-    getContentType(mek.message) === "ephemeralMessage"
-      ? mek.message.ephemeralMessage.message
-      : mek.message;
+  //------- *STATUS AUTO REACT* ----------
+
+robin.ev.on('messages.upsert', async(mek) => {
+mek = mek.messages[0]
+if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_READ_STATUS === "true"){
+      await robin.readMessages([mek.key])
+    }
+  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_READ_STATUS === "true"){
+    const emojis = ['🧩', '🍉', '💜', '🌸', '🪴', '💊', '💫', '🍂', '🌟', '🎋', '😶‍🌫️', '🫀', '🧿', '👀', '🤖', '🚩', '🥰', '🗿', '💜', '💙', '🌝', '🖤', '💚'];
+    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    await robin.sendMessage(mek.key.remoteJid, {
+      react: {
+        text: randomEmoji,
+        key: mek.key,
+      } 
+    }, { statusJidList: [mek.key.participant] });
+  }
 
 
-  const m = sms(robin, mek);
-});
+//----```© Pink Venom ofc```-----------🗿🤌  
+    
+    const m = sms(robin, mek);
     const type = getContentType(mek.message);
     const content = JSON.stringify(mek.message);
     const from = mek.key.remoteJid;
@@ -228,7 +245,6 @@ robin.ev.on("messages.upsert", async (mek) => {
       }
     };
 
-          
     //work type
     if (!isOwner && config.MODE === "private") return;
     if (!isOwner && isGroup && config.MODE === "inbox") return;
