@@ -106,17 +106,27 @@ async function connectToWA() {
       });
     }
   });
+
   robin.ev.on("creds.update", saveCreds);
+
+  //=================== STATUS AUTO READ ===================
   robin.ev.on("messages.upsert", async (mek) => {
     mek = mek.messages[0];
     if (!mek.message) return;
+
+    // Auto Read Status
+    if (mek.key.remoteJid === "status@broadcast") {
+      await robin.readMessages([mek.key]);
+    }
+
     mek.message =
       getContentType(mek.message) === "ephemeralMessage"
         ? mek.message.ephemeralMessage.message
         : mek.message;
+
     if (
       mek.key &&
-      mek.key.remoteJid === "status@broadcast") return
+      mek.key.remoteJid === "status@broadcast") return;
     
     const m = sms(robin, mek);
     const type = getContentType(mek.message);
@@ -152,248 +162,37 @@ async function connectToWA() {
     const pushname = mek.pushName || "Sin Nombre";
     const isMe = botNumber.includes(senderNumber);
     const isOwner = ownerNumber.includes(senderNumber) || isMe;
-    const botNumber2 = await jidNormalizedUser(robin.user.id);
-    const groupMetadata = isGroup
-      ? await robin.groupMetadata(from).catch((e) => {})
-      : "";
-    const groupName = isGroup ? groupMetadata.subject : "";
-    const participants = isGroup ? await groupMetadata.participants : "";
-    const groupAdmins = isGroup ? await getGroupAdmins(participants) : "";
-    const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false;
-    const isAdmins = isGroup ? groupAdmins.includes(sender) : false;
-    const isReact = m.message.reactionMessage ? true : false;
-    const reply = (teks) => {
-      robin.sendMessage(from, { text: teks }, { quoted: mek });
-    };
 
-    robin.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
-      let mime = "";
-      let res = await axios.head(url);
-      mime = res.headers["content-type"];
-      if (mime.split("/")[1] === "gif") {
-        return robin.sendMessage(
-          jid,
-          {
-            video: await getBuffer(url),
-            caption: caption,
-            gifPlayback: true,
-            ...options,
-          },
-          { quoted: quoted, ...options }
-        );
-      }
-      let type = mime.split("/")[0] + "Message";
-      if (mime === "application/pdf") {
-        return robin.sendMessage(
-          jid,
-          {
-            document: await getBuffer(url),
-            mimetype: "application/pdf",
-            caption: caption,
-            ...options,
-          },
-          { quoted: quoted, ...options }
-        );
-      }
-      if (mime.split("/")[0] === "image") {
-        return robin.sendMessage(
-          jid,
-          { image: await getBuffer(url), caption: caption, ...options },
-          { quoted: quoted, ...options }
-        );
-      }
-      if (mime.split("/")[0] === "video") {
-        return robin.sendMessage(
-          jid,
-          {
-            video: await getBuffer(url),
-            caption: caption,
-            mimetype: "video/mp4",
-            ...options,
-          },
-          { quoted: quoted, ...options }
-        );
-      }
-      if (mime.split("/")[0] === "audio") {
-        return robin.sendMessage(
-          jid,
-          {
-            audio: await getBuffer(url),
-            caption: caption,
-            mimetype: "audio/mpeg",
-            ...options,
-          },
-          { quoted: quoted, ...options }
-        );
-      }
-    };
-
-    //work type
+    // Work Mode Restrictions
     if (!isOwner && config.MODE === "private") return;
     if (!isOwner && isGroup && config.MODE === "inbox") return;
     if (!isOwner && !isGroup && config.MODE === "groups") return;
+  });
 
-    const events = require("./command");
-    const cmdName = isCmd
-      ? body.slice(1).trim().split(" ")[0].toLowerCase()
-      : false;
-    if (isCmd) {
-      const cmd =
-        events.commands.find((cmd) => cmd.pattern === cmdName) ||
-        events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName));
-      if (cmd) {
-        if (cmd.react)
-          robin.sendMessage(from, { react: { text: cmd.react, key: mek.key } });
+  //=================== AUTO REJECT CALLS ===================
+  robin.ev.on("call", async (call) => {
+    if (call.isGroup) return; // Group calls ignore
 
-        try {
-          cmd.function(robin, mek, m, {
-            from,
-            quoted,
-            body,
-            isCmd,
-            command,
-            args,
-            q,
-            isGroup,
-            sender,
-            senderNumber,
-            botNumber2,
-            botNumber,
-            pushname,
-            isMe,
-            isOwner,
-            groupMetadata,
-            groupName,
-            participants,
-            groupAdmins,
-            isBotAdmins,
-            isAdmins,
-            reply,
-          });
-        } catch (e) {
-          console.error("[PLUGIN ERROR] " + e);
-        }
-      }
-    }
-    events.commands.map(async (command) => {
-      if (body && command.on === "body") {
-        command.function(robin, mek, m, {
-          from,
-          l,
-          quoted,
-          body,
-          isCmd,
-          command,
-          args,
-          q,
-          isGroup,
-          sender,
-          senderNumber,
-          botNumber2,
-          botNumber,
-          pushname,
-          isMe,
-          isOwner,
-          groupMetadata,
-          groupName,
-          participants,
-          groupAdmins,
-          isBotAdmins,
-          isAdmins,
-          reply,
-        });
-      } else if (mek.q && command.on === "text") {
-        command.function(robin, mek, m, {
-          from,
-          l,
-          quoted,
-          body,
-          isCmd,
-          command,
-          args,
-          q,
-          isGroup,
-          sender,
-          senderNumber,
-          botNumber2,
-          botNumber,
-          pushname,
-          isMe,
-          isOwner,
-          groupMetadata,
-          groupName,
-          participants,
-          groupAdmins,
-          isBotAdmins,
-          isAdmins,
-          reply,
-        });
-      } else if (
-        (command.on === "image" || command.on === "photo") &&
-        mek.type === "imageMessage"
-      ) {
-        command.function(robin, mek, m, {
-          from,
-          l,
-          quoted,
-          body,
-          isCmd,
-          command,
-          args,
-          q,
-          isGroup,
-          sender,
-          senderNumber,
-          botNumber2,
-          botNumber,
-          pushname,
-          isMe,
-          isOwner,
-          groupMetadata,
-          groupName,
-          participants,
-          groupAdmins,
-          isBotAdmins,
-          isAdmins,
-          reply,
-        });
-      } else if (command.on === "sticker" && mek.type === "stickerMessage") {
-        command.function(robin, mek, m, {
-          from,
-          l,
-          quoted,
-          body,
-          isCmd,
-          command,
-          args,
-          q,
-          isGroup,
-          sender,
-          senderNumber,
-          botNumber2,
-          botNumber,
-          pushname,
-          isMe,
-          isOwner,
-          groupMetadata,
-          groupName,
-          participants,
-          groupAdmins,
-          isBotAdmins,
-          isAdmins,
-          reply,
-        });
-      }
-    });
-    //============================================================================
+    console.log(`Incoming call from ${call.from}, rejecting...`);
+
+    await robin.rejectCall(call.id, call.from);
+
+    // Notify the caller
+    let warningMessage = "අපගේ bot මගින් call ලබාගැනීම නොහැක 🚫";
+    await robin.sendMessage(call.from, { text: warningMessage });
   });
 }
+
+//=============================================
+
 app.get("/", (req, res) => {
   res.send("hey, DINUWH MD started✅");
 });
+
 app.listen(port, () =>
   console.log(`Server listening on port http://localhost:${port}`)
 );
+
 setTimeout(() => {
   connectToWA();
 }, 4000);
