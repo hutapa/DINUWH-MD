@@ -1,3 +1,13 @@
+const {
+  default: makeWASocket,
+  useMultiFileAuthState,
+  DisconnectReason,
+  jidNormalizedUser,
+  getContentType,
+  fetchLatestBaileysVersion,
+  Browsers,
+} = require("@whiskeysockets/baileys");
+
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, jidNormalizedUser, getContentType, fetchLatestBaileysVersion, Browsers, } = require("@whiskeysockets/baileys");
 
 const l = console.log; const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, } = require("./lib/functions"); const fs = require("fs"); const P = require("pino"); const config = require("./config"); const qrcode = require("qrcode-terminal"); const util = require("util"); const { sms, downloadMediaMessage } = require("./lib/msg"); const axios = require("axios"); const { File } = require("megajs");
@@ -301,4 +311,6 @@ events.commands.map(async (command) => {
 //============================================================================
 
 }); } app.get("/", (req, res) => { res.send("hey, DINUWH MD started✅"); }); app.listen(port, () => console.log(Server listening on port http://localhost:${port}) ); setTimeout(() => { connectToWA(); }, 4000);
+
+ඕකට ස්ටේට්ස් ඔටෝ රීඩ් වෙන ෆන්ක්ශන් එකයි වට්සැප් කෝල් ආවම ඔටෝ කට් වෙන එකයි හදල ආයෙ ඕනි
 
