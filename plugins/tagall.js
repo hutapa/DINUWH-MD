@@ -14,14 +14,12 @@ cmd(
     m,
     {
       from,
-      quoted,
       isGroup,
-      sender,
-      isOwner,
-      groupMetadata,
-      participants,
-      isBotAdmins,
       isAdmins,
+      isOwner,
+      isBotAdmins,
+      participants,
+      botNumber,
       reply,
     }
   ) => {
@@ -35,20 +33,18 @@ cmd(
         return reply("You need to be an admin to use this command.");
       }
 
-      // Create the mention text for all group members
-      const mentions = participants.map((p) => `@${p.id.split('@')[0]}`).join(' ');
+      // Remove bot from the mention list
+      const filteredParticipants = participants.filter((p) => p.id !== botNumber);
 
-      // Default values for message and image (without database)
-      const ALIVE_MSG = "The bot is alive and running!";
-      const ALIVE_IMG = "https://via.placeholder.com/300"; // Default image
+      // Create mention text
+      const mentions = filteredParticipants.map((p) => `@${p.id.split('@')[0]}`).join(' ');
 
       // Send the message
       return await robin.sendMessage(
         from,
         {
-          image: { url: ALIVE_IMG },
-          caption: `${mentions}\n\n${ALIVE_MSG}`,
-          mentions: participants.map((p) => p.id),
+          text: mentions,
+          mentions: filteredParticipants.map((p) => p.id),
         },
         { quoted: mek }
       );
