@@ -77,34 +77,18 @@ conn.sendMessage(ownerNumber + "@s.whatsapp.net", { image: { url: `https://i.ibb
 })
 conn.ev.on('creds.update', saveCreds)  
 
-conn.ev.on('messages.upsert', async (mek) => { mek = mek.messages[0]; if (!mek.message) return;
+conn.ev.on('messages.upsert', async(mek) => {
+mek = mek.messages[0]
+if (!mek.message) return        
+mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
+ if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_READ_STATUS) {
+            await conn.readMessages([mek.key]);
 
-mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message;
-
-if (mek.key && mek.key.remoteJid === 'status@broadcast') {
-    if (config.AUTO_READ_STATUS) {
-        await conn.readMessages([mek.key]);
-
-        if (config.AUTO_STATUS_REPLY) {
-            const customMessage = config.STATUS_READ_MSG || '✅ Auto Status Seen Bot By Didula-MD-V2';
-            await conn.sendMessage(mek.key.remoteJid, { text: customMessage }, { quoted: mek });
-        }
-    }
-
-    if (config.AUTO_REACT_STATUS) { // Boolean value check directly
-        const emojis = ['🧩', '🍉', '💜', '🌸', '🪴', '💊', '💫', '🍂', '🌟', '🎋', '😶‍🌫️', '🫀', '🧿', '👀', '🤖', '🚩', '🥰', '🗿', '💜', '💙', '🌝', '🖤', '💚'];
-        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-        await conn.sendMessage(mek.key.remoteJid, {
-            react: {
-                text: randomEmoji,
-                key: mek.key,
+            if (config.AUTO_STATUS_REPLY) {
+                const customMessage = config.STATUS_READ_MSG || '✅ Auto Status Seen Bot By Didula-MD-V2';
+                await conn.sendMessage(mek.key.remoteJid, { text: customMessage }, { quoted: mek });
             }
-        }, { statusJidList: [mek.key.participant] });
-    }
-}
-
-});
-
+        }
 
 
 
@@ -192,7 +176,22 @@ console.error("[PLUGIN ERROR] " + e);
 }
 }
 }
-
+events.commands.map(async(command) => {
+if (body && command.on === "body") {
+command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
+} else if (mek.q && command.on === "text") {
+command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
+} else if (
+(command.on === "image" || command.on === "photo") &&
+mek.type === "imageMessage"
+) {
+command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
+} else if (
+command.on === "sticker" &&
+mek.type === "stickerMessage"
+) {
+command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
+}});
 
 
 //============================================================================ 
