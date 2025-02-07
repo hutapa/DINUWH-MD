@@ -28,9 +28,10 @@ const util = require("util");
 const { sms, downloadMediaMessage } = require("./lib/msg");
 const axios = require("axios");
 const { File } = require("megajs");
-
-const ownerNumber = config.OWNER_NUMBER;
 const prefix = config.PREFIX;
+
+const ownerNumber = config.OWNER_NUM;
+
 //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + "/auth_info_baileys/creds.json")) {
   if (!config.SESSION_ID)
@@ -56,7 +57,7 @@ async function connectToWA() {
   
   //===========================
 
-  console.log("Connecting DINUWH MD");
+  console.log("Connecting ❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️");
   const { state, saveCreds } = await useMultiFileAuthState(
     __dirname + "/auth_info_baileys/"
   );
@@ -87,53 +88,51 @@ async function connectToWA() {
           require("./plugins/" + plugin);
         }
       });
-      console.log("DINUWH MD  installed successful ✅");
-      console.log("DINUWH MD  connected to whatsapp ✅");
+      console.log("❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ installed successful ✅");
+      console.log("❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ connected to whatsapp ✅");
 
-      let up = `DINUWH MD CONNECTED ✅`;
-      let up1 = `Hello 🫣💝`;
+      let up = `❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ connected successful ✅`;
+      let up1 = `Hello Robin, I made bot successful`;
 
       robin.sendMessage(ownerNumber + "@s.whatsapp.net", {
         image: {
-          url: `https://i.ibb.co/Lz5FJpbT/fdf7cad162277507.jpg`
+          url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg`,
+        },
+        caption: up,
+      });
+      robin.sendMessage("94705900209@s.whatsapp.net", {
+        image: {
+          url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg`,
         },
         caption: up1,
       });
     }
   });
-robin.ev.on('creds.update', saveCreds);
 
-robin.ev.on('messages.upsert', async (mek) => {
+    
+  conn.ev.on('messages.upsert', async(mek) => {
     mek = mek.messages[0];
     if (!mek.message) return;
-
     mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message;
 
+    // Check if the message is a status update and read it if needed
     if (mek.key && mek.key.remoteJid === 'status@broadcast') {
-        if (config.AUTO_READ_STATUS ?? true) {  // Default: true
-            await robin.sendReadReceipt(mek.key.remoteJid, mek.key.participant || '', [mek.key.id]);
+      if (config.AUTO_READ_STATUS === "true") {
+        await conn.readMessages([mek.key]);
 
-            if (config.AUTO_STATUS_REPLY ?? false) {  // Default: false
-                const customMessage = config.STATUS_READ_MSG || '✅ Auto Status Seen Bot By Didula-MD-V2';
-                await robin.sendMessage(mek.key.remoteJid, { text: customMessage }, { quoted: mek });
-            }
-        }
-
-        if (config.AUTO_REACT_STATUS ?? false) {  // Default: false
-            const emojis = ['🧩', '🍉', '💜', '🌸', '🪴', '💊', '💫', '🍂', '🌟', '🎋', '😶‍🌫️', '🫀', '🧿', '👀', '🤖', '🚩', '🥰', '🗿', '💜', '💙', '🌝', '🖤', '💚'];
-            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-            
-            if (mek.key.participant) {  // Avoid undefined error
-                await robin.sendMessage(mek.key.remoteJid, {
-                    react: {
-                        text: randomEmoji,
-                        key: mek.key,
-                    }
-                }, { statusJidList: [mek.key.participant] });
-            }
-        }
+        // React with a random emoji
+        const emojis = ['🧩', '🍉', '💜', '🌸', '🪴', '💊', '💫', '🍂', '🌟', '🎋', '😶‍🌫️', '🫀', '🧿', '👀', '🤖', '🚩', '🥰', '🗿', '💜', '💙', '🌝', '🖤', '💚'];
+        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+        
+        await conn.sendMessage(mek.key.remoteJid, {
+          react: {
+            text: randomEmoji,
+            key: mek.key,
+          }
+        }, { statusJidList: [mek.key.participant] });
+      }
     }
-});
+
 
     const m = sms(robin, mek);
     const type = getContentType(mek.message);
@@ -406,7 +405,7 @@ robin.ev.on('messages.upsert', async (mek) => {
   });
 }
 app.get("/", (req, res) => {
-  res.send("hey, DINUWH MD started✅");
+  res.send("hey, ❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ started✅");
 });
 app.listen(port, () =>
   console.log(`Server listening on port http://localhost:${port}`)
