@@ -5,7 +5,8 @@ const { downloadMediaMessage } = require("../lib/msg.js"); // Adjust the path as
 cmd(
   {
     pattern: "sticker",
-    alias: ["s", "stick"],
+    alias: ["s", "tos"],
+    react: "🔄",
     desc: "Convert an image to a sticker",
     category: "utility",
     filename: __filename,
