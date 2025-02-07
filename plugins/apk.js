@@ -1,49 +1,46 @@
-const { cmd } = require('../command')
-const { fetchJson } = require('../lib/functions')
+const { cmd, commands } = require('../command');
+const scraper = require("../lib/scraperd");
+const axios = require('axios');
+const fetch = require('node-fetch');
+const { fetchJson, getBuffer } = require('../lib/functions');
+const { lookup } = require('mime-types');
+const fs = require('fs');
+const path = require('path');
 
-const apilink = 'https://www.dark-yasiya-api.site' 
-
-
-
-
+//Apk Download
 cmd({
     pattern: "apk",
-    alias: ["app","ps","playstore"],
-    react: "🔞",
-    desc: "Download App APK ",
+    desc: "Downloads Apk",
+    use: ".apk <app_name>",
+    react: "📥",
     category: "download",
-    use: '.apk < text >',
     filename: __filename
 },
-async(conn, mek, m,{from, quoted, reply, q }) => {
-try{
-
-  if(!q) return await reply("Please give me few word !")
+async (conn, mek, m, { from, quoted, body, q, reply }) => {
+    const appId = q.trim();
+    if (!appId) return reply(`Please provide an app name`);
     
-const apk_search = await fetchJson(`${apilink}/search/apk?text=${q}`)
-if(apk_search.result.data.length < 0) return await reply("Not results found !")
-
-const apk_info = await fetchJson(`${apilink}/download/apk?id=${apk_search.result.data[0].id}`)
+    reply("_Downloading " + appId + "_");
     
-  // GET FIRST APK
-  
-const apkcaption =` 
-
-       🔥   *APK DOWNLOADER*   🔥
-
-     
-🔮 *Name* - ${apk_info.result.name}
-🔮 *Package* - ${apk_info.result.package}
-🔮 *Size* - ${apk_info.result.size}
-`
-await conn.sendMessage( from, { image: { url: apk_info.result.image || '' }, caption: apkcaption }, { quoted: mek })
-
-// SEND APK
-await conn.sendMessage(from, { document: { url: apk_info.result.dl_link }, mimetype: "application/vnd.android.package-archive", fileName: apk_info.result.name , caption: apk_info.result.name }, { quoted: mek });
-
-
-} catch (error) {
-console.log(error)
-reply(error)
-}
+    try {
+        const appInfo = await scraper.aptoideDl(appId);
+        const buff = await getBuffer(appInfo.link);
+        
+        if (!buff || !appInfo.appname) {
+            return await conn.sendMessage(from, { react: { text: '❌', key: mek.key } });
+        }
+        
+        await conn.sendMessage(
+            from,
+            { document: buff, caption: `*HEY*`, mimetype: "application/vnd.android.package-archive", filename: `${appInfo.appname}.apk` },
+            { quoted: mek }
+        );
+        
+        await conn.sendMessage(from, { react: { text: '✅', key: mek.key } });
+        reply("*_Download Success_*");
+    } catch (e) {
+        console.log(e);
+        await conn.sendMessage(from, { react: { text: '❌', key: mek.key } });
+        reply(`Error: ${e.message}`);
+    }
 });
