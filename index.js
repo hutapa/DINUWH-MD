@@ -30,7 +30,7 @@ const axios = require("axios");
 const { File } = require("megajs");
 const prefix = config.PREFIX;
 
-const ownerNumber = config.OWNER_NUM;
+const ownerNumber = config.OWNER_NUMBER;
 
 //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + "/auth_info_baileys/creds.json")) {
@@ -41,7 +41,7 @@ if (!fs.existsSync(__dirname + "/auth_info_baileys/creds.json")) {
   filer.download((err, data) => {
     if (err) throw err;
     fs.writeFile(__dirname + "/auth_info_baileys/creds.json", data, () => {
-      console.log("Session downloaded ✅");
+      console.log("DINUWH MD SESSOIN DOWNLOAD COMPLEATE✅");
     });
   });
 }
@@ -57,7 +57,7 @@ async function connectToWA() {
   
   //===========================
 
-  console.log("Connecting ❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️");
+  console.log("Connecting DINUWH MD");
   const { state, saveCreds } = await useMultiFileAuthState(
     __dirname + "/auth_info_baileys/"
   );
@@ -88,11 +88,11 @@ async function connectToWA() {
           require("./plugins/" + plugin);
         }
       });
-      console.log("❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ installed successful ✅");
-      console.log("❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ connected to whatsapp ✅");
+      console.log("DINUWH MD sever installed successful ✅");
+      console.log("DINUWH MD WABot connected to whatsapp ✅");
 
-      let up = `❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ connected successful ✅`;
-      let up1 = `Hello Robin, I made bot successful`;
+      let up = `DINUWH MD CONNECTED SUCCESSFULL✅`;
+      let up1 = `HEY i am DINUWH MD😻💖`;
 
       robin.sendMessage(ownerNumber + "@s.whatsapp.net", {
         image: {
@@ -100,7 +100,7 @@ async function connectToWA() {
         },
         caption: up,
       });
-      robin.sendMessage("94705900209@s.whatsapp.net", {
+      robin.sendMessage("94728896048@s.whatsapp.net", {
         image: {
           url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg`,
         },
@@ -121,7 +121,7 @@ async function connectToWA() {
         await conn.readMessages([mek.key]);
 
         // React with a random emoji
-        const emojis = ['🧩', '🍉', '💜', '🌸', '🪴', '💊', '💫', '🍂', '🌟', '🎋', '😶‍🌫️', '🫀', '🧿', '👀', '🤖', '🚩', '🥰', '🗿', '💜', '💙', '🌝', '🖤', '💚'];
+        const emojis = ['🧩', '🍉', '💜', '🌸', '🪴', '💊', '💫', '🍂', '🌟', '🎋', '😶‍🌫️', '🫀', '🧿', '👀', '🤖', '🚩', '🥰', '🗿', '💜', '💙', '🌝','📌','🇱🇰','🔮','♥️','🎖️','💧','❄️','🌏','👍','💦','😻','💙','❤️','🩷',💛 '🖤', '💚'];
         const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
         
         await conn.sendMessage(mek.key.remoteJid, {
@@ -405,7 +405,7 @@ async function connectToWA() {
   });
 }
 app.get("/", (req, res) => {
-  res.send("hey, ❤️𝐑_𝐎_𝐁_𝐈_𝐍❤️ started✅");
+  res.send("DINUWH MD is started✅");
 });
 app.listen(port, () =>
   console.log(`Server listening on port http://localhost:${port}`)
