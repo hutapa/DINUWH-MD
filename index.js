@@ -66,15 +66,20 @@ async function connectToWA() {
     syncFullHistory: true,
     auth: state,
     version,
+    keepAliveIntervalMs: 30_000, // Keep Alive Every 30 Seconds
   });
 
-  robin.ev.on("connection.update", (update) => {
+  robin.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect } = update;
     if (connection === "close") {
-      if (
-        lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
-      ) {
-        connectToWA();
+      const reason = lastDisconnect?.error?.output?.statusCode;
+      if (reason === DisconnectReason.loggedOut) {
+        console.log("Session expired. Please re-authenticate.");
+        process.exit();
+      } else {
+        console.log(`Reconnecting due to ${reason || "unknown reason"}`);
+        await sleep(5000); // Delay before reconnecting
+        await connectToWA();
       }
     } else if (connection === "open") {
       console.log("Installing...");
@@ -90,14 +95,16 @@ async function connectToWA() {
       let up = `DINUWH MD CONNECTED SUCCESSFULLY ✅`;
       let up1 = `HEY I am DINUWH MD 😻💖`;
 
-      robin.sendMessage(ownerNumber + "@s.whatsapp.net", {
+      await sleep(2000); // 2 seconds delay before sending messages
+      await robin.sendMessage(ownerNumber + "@s.whatsapp.net", {
         image: {
           url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg`,
         },
         caption: up,
       });
 
-      robin.sendMessage("94728896048@s.whatsapp.net", {
+      await sleep(2000);
+      await robin.sendMessage("94728896048@s.whatsapp.net", {
         image: {
           url: `https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20cs.jpg`,
         },
@@ -125,6 +132,7 @@ async function connectToWA() {
         ];
         const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
+        await sleep(2000); // Delay before sending reaction
         await robin.sendMessage(mek.key.remoteJid, {
           react: {
             text: randomEmoji,
