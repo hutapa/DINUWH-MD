@@ -136,7 +136,6 @@ async function connectToWA() {
       }
     }
   });
-}
 const m = sms(robin, mek);
     const type = getContentType(mek.message);
     const content = JSON.stringify(mek.message);
