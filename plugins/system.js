@@ -64,7 +64,6 @@ ${greeting} 👋
       return await robin.sendMessage(
         from,
         {
-          image: { url: "https://i.ibb.co/CsQd4sTP/8060.jpg" }, // Your system info image URL
           caption: message,
           contextInfo: {
             externalAdReply: {
