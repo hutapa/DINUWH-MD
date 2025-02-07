@@ -2,42 +2,32 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   DisconnectReason,
-  jidNormalizedUser,
   getContentType,
   fetchLatestBaileysVersion,
   Browsers,
 } = require("@whiskeysockets/baileys");
 
-const l = console.log;
-const {
-  getBuffer,
-  getGroupAdmins,
-  getRandom,
-  h2k,
-  isUrl,
-  Json,
-  runtime,
-  sleep,
-  fetchJson,
-} = require("./lib/functions");
 const fs = require("fs");
 const P = require("pino");
 const config = require("./config");
 const qrcode = require("qrcode-terminal");
-const util = require("util");
-const { sms, downloadMediaMessage } = require("./lib/msg");
-const axios = require("axios");
-const { File } = require("megajs");
-const prefix = config.PREFIX;
+const { sleep } = require("./lib/functions");
+const { parseMessage } = require("./lib/command"); // Command parser එක import කරමු
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 8000;
 
 const ownerNumber = config.OWNER_NUMBER;
 
-//===================SESSION-AUTH============================
+//=================== SESSION AUTH ============================
 if (!fs.existsSync(__dirname + "/auth_info_baileys/creds.json")) {
   if (!config.SESSION_ID)
     return console.log("Please add your session to SESSION_ID env !!");
+
+  const { File } = require("megajs");
   const sessdata = config.SESSION_ID;
   const filer = File.fromURL(`https://mega.nz/file/${sessdata}`);
+
   filer.download((err, data) => {
     if (err) throw err;
     fs.writeFile(__dirname + "/auth_info_baileys/creds.json", data, () => {
@@ -46,14 +36,10 @@ if (!fs.existsSync(__dirname + "/auth_info_baileys/creds.json")) {
   });
 }
 
-const express = require("express");
-const app = express();
-const port = process.env.PORT || 8000;
-
 //=============================================
 
 async function connectToWA() {
-  console.log("Connecting DINUWH MD");
+  console.log("Connecting DINUWH MD...");
   const { state, saveCreds } = await useMultiFileAuthState(
     __dirname + "/auth_info_baileys/"
   );
@@ -69,6 +55,7 @@ async function connectToWA() {
     keepAliveIntervalMs: 30_000, // Keep Alive Every 30 Seconds
   });
 
+  // Connection Status
   robin.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect } = update;
     if (connection === "close") {
@@ -113,33 +100,30 @@ async function connectToWA() {
     }
   });
 
+  // Messages Upsert - Command Handling
   robin.ev.on("messages.upsert", async (mek) => {
-    mek = mek.messages[0];
-    if (!mek.message) return;
-    mek.message = (getContentType(mek.message) === "ephemeralMessage")
-      ? mek.message.ephemeralMessage.message
-      : mek.message;
+    try {
+      mek = mek.messages[0];
+      if (!mek.message) return;
 
-    if (mek.key && mek.key.remoteJid === "status@broadcast") {
-      if (config.AUTO_READ_STATUS === "true") {
-        await robin.readMessages([mek.key]);
+      mek.message =
+        getContentType(mek.message) === "ephemeralMessage"
+          ? mek.message.ephemeralMessage.message
+          : mek.message;
 
-        const emojis = [
-          "🧩", "🍉", "💜", "🌸", "🪴", "💊", "💫", "🍂", "🌟", "🎋", "😶‍🌫️",
-          "🫀", "🧿", "👀", "🤖", "🚩", "🥰", "🗿", "💜", "💙", "🌝", "📌",
-          "🇱🇰", "🔮", "♥️", "🎖️", "💧", "❄️", "🌏", "👍", "💦", "😻",
-          "💙", "❤️", "🩷", "💛", "🖤", "💚"
-        ];
-        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+      if (mek.key && mek.key.remoteJid === "status@broadcast") return;
 
-        await sleep(2000); // Delay before sending reaction
-        await robin.sendMessage(mek.key.remoteJid, {
-          react: {
-            text: randomEmoji,
-            key: mek.key,
-          },
-        });
-      }
+      const msg = await parseMessage(robin, mek, config.PREFIX);
+      if (!msg) return;
+
+      // Plugin Load & Execute Commands
+      fs.readdirSync("./plugins/").forEach((plugin) => {
+        if (plugin.endsWith(".js")) {
+          require("./plugins/" + plugin)(robin, msg);
+        }
+      });
+    } catch (err) {
+      console.error("Message Upsert Error:", err);
     }
   });
 }
