@@ -6,6 +6,7 @@ cmd(
     alias: ["status"],
     desc: "Check if the bot is alive",
     category: "main",
+    react: "❄️",
     filename: __filename,
   },
   async (
