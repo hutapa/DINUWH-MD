@@ -1,6 +1,5 @@
 const axios = require('axios');
-const { Sticker, StickerTypes } = require('wa-sticker-formatter');
-const tgsToWebp = require('tgs-to-webp');  // tgs-to-webp library to convert tgs to webp
+const { Sticker, StickerTypes } = require('wa-sticker-formatter');// tgs-to-webp library to convert tgs to webp
 const config = require('../config');
 const { cmd, commands } = require('../command');
 
