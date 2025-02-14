@@ -4,7 +4,7 @@ const { isUrl, getTelegramStickers, getBuffer, sticker, sleep } = require("../li
 
 // Define the tg sticker download command
 cmd({
-  pattern: 'tg ?(.*)', // Command pattern to match 'tg <url>'
+  pattern: 'tg', // Command pattern to match 'tg <url>'
   desc: 'Download Telegram sticker pack', // Description of the command
   category: 'media', // Categorize the command (optional)
   react: '📥', // React with an emoji after the command is executed
