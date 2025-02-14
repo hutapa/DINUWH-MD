@@ -19,26 +19,22 @@ const axios = require('axios');
 const { File } = require('megajs');
 const prefix = '.';
 
-const ownerNumber = ['94771820962'];
+const ownerNumber = ['94729787750'];
 
 //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/auth_info_baileys/creds.json')) {
-  if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!');
-  const sessdata = config.SESSION_ID;
-  const filer = File.fromURL(`https://mega.nz/file/${sessdata}`);
+  if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
+  const sessdata = sessionID
+  const filer = File.fromURL(`https://mega.nz/file/${sessdata}`)
   filer.download((err, data) => {
-    if(err) throw err;
-    fs.writeFile(__dirname + '/auth_info_baileys/creds.json', data, () => {
-      console.log("Didula MD V2 💚 Session downloaded ✅");
-    });
-  });
-}
-
+  if(err) throw err
+  fs.writeFile(__dirname + '/auth_info_baileys/creds.json', data, () => {
+  console.log("Session downloaded ✅")
+  })})}    
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 8000;
-
-//=============================================
+//================================/
 
 async function connectToWA() {
   console.log("Didula MD V2 💚 Connecting wa bot 🧬...");
@@ -156,6 +152,56 @@ async function connectToWA() {
         return conn.sendMessage(jid, { audio: await getBuffer(url), caption: caption, mimetype: 'audio/mpeg', ...options }, { quoted: quoted, ...options });
       }
     }
+
+
+//==============================Svae stetus============================================== 
+  
+  if(body === "send" || body === "Send" || body === "Ewpm" || body === "ewpn" || body === "Dapan" || body === "dapan" || body === "oni" || body === "Oni" || body === "save" || body === "Save" || body === "ewanna" || body === "Ewanna" || body === "ewam" || body === "Ewam" || body === "sv" || body === "Sv"|| body === "දාන්න"|| body === "එවම්න"){
+    // if(!m.quoted) return reply("*Please Mention status*")
+    const data = JSON.stringify(mek.message, null, 2);
+    const jsonData = JSON.parse(data);
+    const isStatus = jsonData.extendedTextMessage.contextInfo.remoteJid;
+    if(!isStatus) return
+
+    const getExtension = (buffer) => {
+        const magicNumbers = {
+            jpg: 'ffd8ffe0',
+            png: '89504e47',
+            mp4: '00000018',
+        };
+        const magic = buffer.toString('hex', 0, 4);
+        return Object.keys(magicNumbers).find(key => magicNumbers[key] === magic);
+    };
+
+    if(m.quoted.type === 'imageMessage') {
+        var nameJpg = getRandom('');
+        let buff = await m.quoted.download(nameJpg);
+        let ext = getExtension(buff);
+        await fs.promises.writeFile("./" + ext, buff);
+        const caption = m.quoted.imageMessage.caption;
+        await conn.sendMessage(from, { image: fs.readFileSync("./" + ext), caption: caption });
+    } else if(m.quoted.type === 'videoMessage') {
+        var nameJpg = getRandom('');
+        let buff = await m.quoted.download(nameJpg);
+        let ext = getExtension(buff);
+        await fs.promises.writeFile("./" + ext, buff);
+        const caption = m.quoted.videoMessage.caption;
+        let buttonMessage = {
+            video: fs.readFileSync("./" + ext),
+            mimetype: "video/mp4",
+            fileName: `${m.id}.mp4`,
+            caption: "> ✨✨ᴋᴀᴡᴅʜɪᴛʜᴀ  ᴍᴅ - " + caption ,
+            headerType: 4
+        };
+        await conn.sendMessage(from, buttonMessage,{
+            quoted: mek
+        });
+    }
+   }
+
+
+//============================================================================ 
+
 
     // Always set the bot's presence status to 'unavailable'
     conn.sendPresenceUpdate('unavailable'); // Sets the bot's last seen status
