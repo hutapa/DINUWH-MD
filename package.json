@@ -28,6 +28,6 @@
     "xml2js": "^0.6.2",
     "cheerio": "^1.0.0",
     "@sl-code-lords/movie-api": "1.0.0",
-    "@sl-code-lords/movie-api": "1.0.0"
+    "tgs-to-webp": "^1.0.0"   // Add this line
   }
 }
