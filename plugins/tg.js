@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
+const tgsToWebp = require('tgs-to-webp');  // tgs-to-webp library to convert tgs to webp
 const config = require('../config');
 const { cmd, commands } = require('../command');
 
@@ -91,8 +92,10 @@ cmd({
             { quoted: mek }
           );
         } else if (contentType === 'tgs') {
-          // Handle animated stickers (.tgs)
-          const sticker = new Sticker(buffer.data, {
+          // Handle animated stickers (.tgs) by converting to .webp
+          const webpBuffer = await tgsToWebp(buffer.data);  // Convert .tgs to .webp
+
+          const sticker = new Sticker(webpBuffer, {
             pack: '🐲𝐊𝐄𝐑𝐌 𝐌𝐃 𝐕𝟏🐲',
             author: '𝐋𝐎𝐑𝐃 𝐊𝐄𝐑𝐌',
             type: StickerTypes.ANIMATED,
