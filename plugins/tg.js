@@ -1,17 +1,17 @@
 const config = require('../config');
 const { cmd, commands } = require('../command');
- // Assuming these functions are available
+const { isUrl, getTelegramStickers, getBuffer, sticker, sleep } = require('../lib'); // Assuming these functions are available
 
 // Define the tg sticker download command
 cmd({
-  pattern: 'tg', // Command pattern to match 'tg <url>'
+  pattern: 'tg ?(.*)', // Command pattern to match 'tg <url>'
   desc: 'Download Telegram sticker pack', // Description of the command
   category: 'media', // Categorize the command (optional)
   react: '📥', // React with an emoji after the command is executed
   filename: __filename // Reference to the current file (optional)
 }, async (conn, mek, m, { from, reply }) => {
-  const match = m.text.split(' ')[1]; // Extract the URL from the command input
-  const url = isUrl(match || m.reply_message.text); // Check if the input or the reply is a valid URL
+  const match = m.text ? m.text.split(' ')[1] : null; // Check if m.text is defined, then split the text
+  const url = isUrl(match || m.reply_message?.text); // Check if the match or the replied message is a valid URL
 
   if (!url) return reply('*Example :* tg https://t.me/addstickers/sticker'); // If no URL, send an example message
 
