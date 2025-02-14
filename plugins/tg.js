@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { Sticker, createSticker, StickerTypes } = require('wa-sticker-formatter');
-const config = require('../../settings);
+const config = require('../config');
 const { cmd, commands } = require('../command');
 
 
@@ -41,7 +41,7 @@ cmd({
 
     let type = stickers.data.result.is_animated ? 'animated sticker' : 'not animated sticker';
 
-    let message = `*🧩MALVIN TELEGRAM STICKERS🧩*\n\n` +
+    let message = `*🧩KERM TELEGRAM STICKERS🧩*\n\n` +
                   `*Producer:* ${stickers.data.result.name}\n` +
                   `*Type:* ${type}\n` +
                   `*Length:* ${stickers.data.result.stickers.length}\n\n` +
@@ -51,15 +51,15 @@ cmd({
 await conn.sendMessage(
             from,
             {
-                image: { url: `https://files.catbox.moe/qybpal.jpg` },
+                image: { url: `https://i.ibb.co/B2nBXKvx/lordkerm.jpg` },
                 caption: message,
                 contextInfo: {
                     mentionedJid: [m.sender],
                     forwardingScore: 999,
                     isForwarded: true,
                     forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363306168354073@newsletter',
-                        newsletterName: '😎𝐌𝐀𝐋𝐕𝐈𝐍 𝐓𝐆𝐒😎',
+                        newsletterJid: '120363321386877609@newsletter',
+                        newsletterName: '🐲𝐊𝐄𝐑𝐌 𝐓𝐆𝐒🐲',
                         serverMessageId: 143
                     }
                 }
@@ -80,8 +80,8 @@ await conn.sendMessage(
 
       // Create a WhatsApp sticker
       const sticker = new Sticker(buffer.data, {
-        pack: '👾𝐌𝐀𝐋𝐕𝐈𝐍 𝐃 𝐕2👾',
-        author: '𝐋𝐎𝐑𝐃 𝐌𝐀𝐋𝐕𝐈𝐍',
+        pack: '🐲𝐊𝐄𝐑𝐌 𝐌𝐃 𝐕𝟏🐲',
+        author: '𝐋𝐎𝐑𝐃 𝐊𝐄𝐑𝐌',
         type: StickerTypes.FULL,
         categories: ['🤩', '🎉'],
         id: '12345',
