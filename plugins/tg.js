@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { Sticker, createSticker, StickerTypes } = require('wa-sticker-formatter');
+const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const config = require('../config');
 const { cmd, commands } = require('../command');
 
@@ -70,45 +70,50 @@ cmd({
       const contentType = file.data.result.file_path.split('.').pop();
 
       // Check for image formats (webp, png, etc.)
-      if (contentType === 'webp' || contentType === 'png') {
-        const sticker = new Sticker(buffer.data, {
-          pack: '🐲𝐊𝐄𝐑𝐌 𝐌𝐃 𝐕𝟏🐲',
-          author: '𝐋𝐎𝐑𝐃 𝐊𝐄𝐑𝐌',
-          type: StickerTypes.FULL,
-          categories: ['🤩', '🎉'],
-          id: '12345',
-          quality: 50,
-          background: '#000000'
-        });
+      try {
+        if (contentType === 'webp' || contentType === 'png') {
+          const sticker = new Sticker(buffer.data, {
+            pack: '🐲𝐊𝐄𝐑𝐌 𝐌𝐃 𝐕𝟏🐲',
+            author: '𝐋𝐎𝐑𝐃 𝐊𝐄𝐑𝐌',
+            type: StickerTypes.FULL,
+            categories: ['🤩', '🎉'],
+            id: '12345',
+            quality: 50,
+            background: '#000000'
+          });
 
-        const stickerBuffer = await sticker.toBuffer();
+          const stickerBuffer = await sticker.toBuffer();
 
-        // Send the sticker
-        await conn.sendMessage(
-          from,
-          { sticker: stickerBuffer },
-          { quoted: mek }
-        );
-      } else if (contentType === 'tgs') {
-        // Handle animated stickers (.tgs)
-        const sticker = new Sticker(buffer.data, {
-          pack: '🐲𝐊𝐄𝐑𝐌 𝐌𝐃 𝐕𝟏🐲',
-          author: '𝐋𝐎𝐑𝐃 𝐊𝐄𝐑𝐌',
-          type: StickerTypes.ANIMATED,
-          categories: ['🤩', '🎉'],
-          id: '12345',
-          quality: 50,
-          background: '#000000'
-        });
+          // Send the sticker
+          await conn.sendMessage(
+            from,
+            { sticker: stickerBuffer },
+            { quoted: mek }
+          );
+        } else if (contentType === 'tgs') {
+          // Handle animated stickers (.tgs)
+          const sticker = new Sticker(buffer.data, {
+            pack: '🐲𝐊𝐄𝐑𝐌 𝐌𝐃 𝐕𝟏🐲',
+            author: '𝐋𝐎𝐑𝐃 𝐊𝐄𝐑𝐌',
+            type: StickerTypes.ANIMATED,
+            categories: ['🤩', '🎉'],
+            id: '12345',
+            quality: 50,
+            background: '#000000'
+          });
 
-        const stickerBuffer = await sticker.toBuffer();
+          const stickerBuffer = await sticker.toBuffer();
 
-        // Send the sticker
-        await conn.sendMessage(
-          from,
-          { sticker: stickerBuffer },
-          { quoted: mek }
-        );
+          // Send the sticker
+          await conn.sendMessage(
+            from,
+            { sticker: stickerBuffer },
+            { quoted: mek }
+          );
+        }
+      } catch (error) {
+        console.error(`Error creating sticker from ${file.data.result.file_path}:`, error);
+        reply(`Error creating sticker for ${file.data.result.file_path}. Please try again.`);
       }
 
       // Add a small delay to avoid rate limits
