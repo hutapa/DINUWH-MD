@@ -1,44 +1,111 @@
+const axios = require('axios');
+const { Sticker, createSticker, StickerTypes } = require('wa-sticker-formatter');
 const config = require('../config');
 const { cmd, commands } = require('../command');
-const { isUrl, getTelegramStickers, getBuffer, sticker, sleep } = require("../lib/tg.js") // Assuming these functions are available
 
-// Define the tg sticker download command
+
 cmd({
-  pattern: 'tg', // Command pattern to match 'tg <url>'
-  desc: 'Download Telegram sticker pack', // Description of the command
-  category: 'media', // Categorize the command (optional)
-  react: '📥', // React with an emoji after the command is executed
-  filename: __filename // Reference to the current file (optional)
-}, async (conn, mek, m, { from, reply }) => {
-  const match = m.text ? m.text.split(' ')[1] : null; // Check if m.text is defined, then split the text
-  const url = isUrl(match || m.reply_message?.text); // Check if the match or the replied message is a valid URL
-
-  if (!url) return reply('*Example :* tg https://t.me/addstickers/sticker'); // If no URL, send an example message
-
+  pattern: 'tgs',
+  alias: ['tgsticker', 'telegramsticker'],
+  react: '🎴',
+  desc: 'Download and convert Telegram sticker packs to WhatsApp stickers',
+  category: 'Mods',
+  filename: __filename
+}, async (conn, mek, m, { from, reply, args, sender, isAdmin }) => {
   try {
-    const results = await getTelegramStickers(match); // Fetch stickers from the Telegram sticker URL
-    const stickersCount = results.stickers.length; // Get the number of stickers in the pack
-
-    if (stickersCount === 0) return reply('Stickers not supported'); // If no stickers are found
-
-    await reply(`Downloading ${stickersCount} stickers from ${results.title}`); // Notify about the download
-
-    // Loop through the stickers and send them one by one
-    for (const s of results.stickers) {
-      try {
-        if (s.name.endsWith('webp')) {
-          await conn.sendMessage(from, { sticker: { url: s.url } }); // Send webp sticker directly
-        } else {
-          const buffer = await getBuffer(s.url); // Get the buffer for non-webp stickers
-          await conn.sendMessage(from, await sticker('str', buffer.name, 2, m.id), { isAnimated: buffer.type === 'video' }, 'sticker'); // Send sticker
-        }
-      } catch (e) {
-        await reply('Error: An issue occurred while downloading a sticker!');
-      }
-      await sleep(1000); // Sleep to avoid flooding the server
+  /*  // Check if the user is a mod or admin
+    if (!isAdmin) {
+      reply('Only Mods can use this command.');
+      return;
     }
-  } catch (e) {
-    await reply('Error: Could not process the sticker pack.');
-    console.log(e);
+    */
+
+    // Check if a Telegram sticker link is provided
+    if (!args[0]) {
+      reply('Please provide a Telegram sticker pack link.\n\n Example `.tgs` https://t.me/addstickers/telegramkerm ');
+      return;
+    }
+
+    const lien = args.join(' ');
+    const name = lien.split('/addstickers/')[1];
+
+    if (!name) {
+      reply('Invalid Telegram sticker link.');
+      return;
+    }
+
+    const api = `https://api.telegram.org/bot7025486524:AAGNJ3lMa8610p7OAIycwLtNmF9vG8GfboM/getStickerSet?name=${encodeURIComponent(name)}`;
+
+    // Fetch sticker pack details
+    const stickers = await axios.get(api);
+
+    let type = stickers.data.result.is_animated ? 'animated sticker' : 'not animated sticker';
+
+    let message = `*🧩KERM TELEGRAM STICKERS🧩*\n\n` +
+                  `*Producer:* ${stickers.data.result.name}\n` +
+                  `*Type:* ${type}\n` +
+                  `*Length:* ${stickers.data.result.stickers.length}\n\n` +
+                  `> Please wait...`;
+
+   // await reply(message);
+await conn.sendMessage(
+            from,
+            {
+                image: { url: `https://i.ibb.co/B2nBXKvx/lordkerm.jpg` },
+                caption: message,
+                contextInfo: {
+                    mentionedJid: [m.sender],
+                    forwardingScore: 999,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: '120363321386877609@newsletter',
+                        newsletterName: '🐲𝐊𝐄𝐑𝐌 𝐓𝐆𝐒🐲',
+                        serverMessageId: 143
+                    }
+                }
+            },
+            { quoted: mek }
+        );
+    
+
+    // Loop through each sticker in the pack
+    for (let i = 0; i < stickers.data.result.stickers.length; i++) {
+      const file = await axios.get(`https://api.telegram.org/bot7025486524:AAGNJ3lMa8610p7OAIycwLtNmF9vG8GfboM/getFile?file_id=${stickers.data.result.stickers[i].file_id}`);
+
+      const buffer = await axios({
+        method: 'get',
+        url: `https://api.telegram.org/file/bot7025486524:AAGNJ3lMa8610p7OAIycwLtNmF9vG8GfboM/${file.data.result.file_path}`,
+        responseType: 'arraybuffer',
+      });
+
+      // Create a WhatsApp sticker
+      const sticker = new Sticker(buffer.data, {
+        pack: '🐲𝐊𝐄𝐑𝐌 𝐌𝐃 𝐕𝟏🐲',
+        author: '𝐋𝐎𝐑𝐃 𝐊𝐄𝐑𝐌',
+        type: StickerTypes.FULL,
+        categories: ['🤩', '🎉'],
+        id: '12345',
+        quality: 50,
+        background: '#000000'
+      });
+
+      const stickerBuffer = await sticker.toBuffer();
+
+      // Send the sticker
+      await conn.sendMessage(
+        from,
+        { sticker: stickerBuffer },
+        { quoted: mek }
+      );
+
+      // Add a small delay to avoid rate limits
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    reply('Sticker pack download complete!');
+
+  } catch (error) {
+    console.error('Error processing Telegram sticker pack:', error);
+    reply('An error occurred while processing the sticker pack. Please try again.');
   }
 });
