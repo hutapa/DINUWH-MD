@@ -1,6 +1,6 @@
 const config = require('../config');
 const { cmd, commands } = require('../command');
-const { isUrl, getTelegramStickers, getBuffer, sticker, sleep } = require('../lib'); // Assuming these functions are available
+const { isUrl, getTelegramStickers, getBuffer, sticker, sleep } = require("../lib/tg.js") // Assuming these functions are available
 
 // Define the tg sticker download command
 cmd({
